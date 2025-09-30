@@ -1,0 +1,9 @@
+{
+  "BLINDSKILLROLLS.Module.Init": "Blind Skill Rolls | Init",
+  "BLINDSKILLROLLS.Module.Ready": "Blind Skill Rolls | Ready",
+  "BLINDSKILLROLLS.Settings.Enabled.Name": "Enable Blind Skill Rolls",
+  "BLINDSKILLROLLS.Settings.Enabled.Hint": "Turn the module on or off globally.",
+  "BLINDSKILLROLLS.Settings.BlindAll.Name": "Blind all skills by default",
+  "BLINDSKILLROLLS.Settings.BlindAll.Hint": "When enabled, all skill checks are Blind GM Rolls unless explicitly disabled per skill.",
+  "BLINDSKILLROLLS.Debug.SetRollMode": "Blind Skill Rolls | Forcing roll mode to BLIND for skill: {skill}"
+}

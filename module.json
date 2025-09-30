@@ -1,0 +1,42 @@
+{
+  "id": "blind-skill-rolls",
+  "title": "Blind Skill Rolls",
+  "version": "1.0.0",
+  "description": "<p>Automatically sets selected DnD5e skill checks to Blind GM Roll. </p><p>Setzt ausgewählte DnD5e-Skillwürfe automatisch als Blind GM Roll.</p>",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "authors": [
+    {
+      "name": "GWagner",
+      "url": "https://github.com/GWagner2021/blind-skill-rolls",
+      "flags": {}
+    }
+  ],
+  "flags": { "canUpload": false },
+  "relationships": {
+    "systems": [
+      { "id": "dnd5e", "type": "system" }
+    ]
+  },
+  "languages": [
+    { "lang": "en", "name": "English",  "path": "lang/en.json", "flags": {} },
+    { "lang": "de", "name": "Deutsch",  "path": "lang/de.json", "flags": {} },
+    { "lang": "fr", "name": "Français", "path": "lang/fr.json", "flags": {} },
+    { "lang": "es", "name": "Español",  "path": "lang/es.json", "flags": {} },
+    { "lang": "it", "name": "Italiano", "path": "lang/it.json", "flags": {} },
+    { "lang": "pl", "name": "Polski",   "path": "lang/pl.json", "flags": {} }
+  ],
+  "scripts": [
+    "scripts/settings.js",
+    "scripts/blind-skill-rolls.js"
+  ],
+  "url": "https://github.com/GWagner2021/blind-skill-rolls",
+  "bugs": "https://github.com/GWagner2021/blind-skill-rolls/issues",
+  "readme": "https://github.com/GWagner2021/blind-skill-rolls#readme",
+  "license": "https://github.com/GWagner2021/blind-skill-rolls/blob/main/LICENSE",
+  "changelog": "https://github.com/GWagner2021/blind-skill-rolls/blob/main/CHANGELOG.md",
+  "manifest": "https://github.com/GWagner2021/blind-skill-rolls/releases/latest/download/module.json",
+  "download": "https://github.com/GWagner2021/blind-skill-rolls/releases/latest/download/blind-skill-rolls.zip"
+}
