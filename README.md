@@ -1,4 +1,5 @@
-# Blind Skill Rolls (Foundry VTT · dnd5e)
+
+# Blind Skill Rolls (Foundry VTT · dnd5e) [![stable](https://img.shields.io/github/v/release/GWagner2021/blind-skill-rolls?label=stable&display_name=tag&sort=semver)](https://github.com/GWagner2021/blind-skill-rolls/releases/latest) ![downloads](https://img.shields.io/github/downloads/GWagner2021/blind-skill-rolls/total?label=downloads) ![license](https://img.shields.io/github/license/GWagner2021/blind-skill-rolls?label=license)
 
 Automatically forces selected **dnd5e** skill checks to **Blind GM Roll** (Foundry v13+).
 
