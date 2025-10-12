@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-{
-  "BLINDSKILLROLLS.Module.Init": "Blind Skill Rolls | Init",
-  "BLINDSKILLROLLS.Module.Ready": "Blind Skill Rolls | Ready",
-  "BLINDSKILLROLLS.Settings.Enabled.Name": "Blind Skill Rolls aktivieren",
-  "BLINDSKILLROLLS.Settings.Enabled.Hint": "Schaltet das Modul global ein oder aus.",
-  "BLINDSKILLROLLS.Settings.BlindAll.Name": "Alle Skills standardmäßig blind",
-  "BLINDSKILLROLLS.Settings.BlindAll.Hint": "Wenn aktiv, sind alle Skillwürfe Blind GM Roll, außer sie sind pro Skill explizit deaktiviert.",
-  "BLINDSKILLROLLS.Debug.SetRollMode": "Blind Skill Rolls | Roll-Modus BLIND für Skill: {skill}"
-}
-=======
 {
   "BLINDSKILLROLLS.NPC.Unknown": "Unbekannt",
 
@@ -61,4 +50,3 @@
 
   "BLINDSKILLROLLS.Log.ReadyText": "bereit | hide={hide} | mute={mute}"
 }
->>>>>>> d5abf81 (update)
