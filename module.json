@@ -1,7 +1,11 @@
 {
   "id": "blind-skill-rolls",
   "title": "Blind Skill Rolls",
+<<<<<<< HEAD
   "version": "1.0.0",
+=======
+  "version": "1.0.1",
+>>>>>>> d5abf81 (update)
   "description": "<p>Automatically sets selected DnD5e skill checks to Blind GM Roll. </p><p>Setzt ausgewählte DnD5e-Skillwürfe automatisch als Blind GM Roll.</p>",
   "compatibility": {
     "minimum": "13",
@@ -18,7 +22,18 @@
   "relationships": {
     "systems": [
       { "id": "dnd5e", "type": "system" }
+<<<<<<< HEAD
     ]
+=======
+    ],
+    "requires": [
+    {
+      "id": "lib-wrapper",
+      "type": "module",
+      "compatibility": { "minimum": "1.12.6.0", "verified": "1.13.4.0" }
+    }
+  ]
+>>>>>>> d5abf81 (update)
   },
   "languages": [
     { "lang": "en", "name": "English",  "path": "lang/en.json", "flags": {} },
@@ -28,10 +43,26 @@
     { "lang": "it", "name": "Italiano", "path": "lang/it.json", "flags": {} },
     { "lang": "pl", "name": "Polski",   "path": "lang/pl.json", "flags": {} }
   ],
+<<<<<<< HEAD
   "scripts": [
     "scripts/settings.js",
     "scripts/blind-skill-rolls.js"
   ],
+=======
+"scripts": [
+  "scripts/settings/bsr-settings.js",
+  "scripts/settings/bsr-chat-settings.js",
+  "scripts/settings/bsr-skills-settings.js",
+  "scripts/settings/bsr-death-settings.js",
+  "scripts/settings/settings-dsn.js",
+
+  "scripts/bsr-chat-hide.js",
+  "scripts/bsr-skills.js",
+  "scripts/bsr-death-saves.js",
+  "scripts/bsr-gm-privacy.js",
+  "scripts/bsr-npc-reveal.js"
+],
+>>>>>>> d5abf81 (update)
   "url": "https://github.com/GWagner2021/blind-skill-rolls",
   "bugs": "https://github.com/GWagner2021/blind-skill-rolls/issues",
   "readme": "https://github.com/GWagner2021/blind-skill-rolls#readme",

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "BLINDSKILLROLLS.Module.Init": "Blind Skill Rolls | Init",
   "BLINDSKILLROLLS.Module.Ready": "Blind Skill Rolls | Ready",
@@ -7,3 +8,57 @@
   "BLINDSKILLROLLS.Settings.BlindAll.Hint": "When enabled, all skill checks are Blind GM Rolls unless explicitly disabled per skill.",
   "BLINDSKILLROLLS.Debug.SetRollMode": "Blind Skill Rolls | Forcing roll mode to BLIND for skill: {skill}"
 }
+=======
+{
+  "BLINDSKILLROLLS.NPC.Unknown": "Sconosciuto",
+
+  "BLINDSKILLROLLS.Settings.Enabled.Name": "Abilita i tiri abilità nascosti",
+
+  "BSR.SettingsGroup.Skills.Legend": "Tiri abilità (GM Cieco)",
+  "BSR.SettingsGroup.Skills.Hint": "Scegli quali abilità forzare come «Tiro cieco del GM».",
+  "BSR.UI.Skills": "Abilità",
+  "BSR.UI.All": "Tutte",
+  "BSR.UI.None": "Nessuna",
+  "BSR.UI.Defaults": "Predefiniti",
+  "BSR.Menu.Skills.Name": "Configura i tiri abilità nascosti",
+  "BSR.Menu.Skills.Label": "abilita/disabilita abilità specifiche",
+  "BSR.UI.Cancel": "Annulla",
+  "BSR.UI.Save": "Salva",
+
+  "BSR.Settings.DSNGhostDice.Name": "Dice So Nice: dadi fantasma",
+  "BSR.Settings.DSNGhostDice.Hint": "Mostra i dadi fantasma solo all’autore del tiro (consigliato) oppure disattivali.",
+  "BSR.Notifications.DSNGhostDiceSet": "Modalità dadi fantasma impostata su {target}.",
+  "BSR.Errors.DSNNotActive": "Dice So Nice non è attivo.",
+
+  "BLINDSKILLROLLS.Settings.HideForeign.Name": "Nascondi messaggi segreti altrui",
+  "BLINDSKILLROLLS.Settings.HideForeign.Hint": "Nascondi messaggi ciechi/sussurrati non indirizzati all’utente corrente.",
+  "BLINDSKILLROLLS.Settings.MuteForeign.Name": "Silenzia suoni dei dadi altrui",
+  "BLINDSKILLROLLS.Settings.MuteForeign.Hint": "Sopprimi i suoni dei dadi per i tiri segreti di altri giocatori.",
+  "BLINDSKILLROLLS.Settings.GmSanitize.Name": "Ripulisci i tiri pubblici del GM",
+  "BLINDSKILLROLLS.Settings.TrustedDetails.Name": "Utenti fidati vedono i dettagli",
+
+  "BLINDSKILLROLLS.Section.ChatDisplay": "Display chat & privacy (GM)",
+  "BSR.Menu.Chat.Name": "Configura display chat",
+  "BSR.Menu.Chat.Label": "visibilità dei messaggi chat",
+
+  "BSR.Menu.GMRolls.Legend": "Tiri del GM",
+
+  "BLINDSKILLROLLS.Section.NPC": "Mascheramento PNG",
+  "BLINDSKILLROLLS.Settings.NpcMaskDefault.Name": "Nascondi i nomi dei PNG ai giocatori (Questa casella non è funzionale al momento, sempre attiva)",
+  "BLINDSKILLROLLS.Settings.NpcMaskDefault.Hint": "Se attivo, i nomi dei PNG sono mascherati finché non vengono rivelati.",
+  "BLINDSKILLROLLS.Settings.NpcReplacement.Name": "Nome segnaposto PNG",
+  "BLINDSKILLROLLS.Settings.NpcReplacement.Hint": "Nome mostrato ai giocatori al posto di quello reale.",
+  "BLINDSKILLROLLS.Menu.Chat.Note": "-",
+
+  "BLINDSKILLROLLS.Section.DeathSaves": "Tiri salvezza contro la morte",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.Name": "Visibilità dei tiri contro la morte",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.Hint": "Scegli come pubblicarli: pubblico, privato al GM, o cieco (solo GM).",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.public": "Pubblico (tutti vedono il tiro)",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.privatroll": "Privato al GM (autore + GM)",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.blindroll": "Cieco del GM (solo GM)",
+  "BSR.Menu.DeathSaves.Name": "Configura tiri contro la morte",
+  "BSR.Menu.DeathSaves.Label": "visibilità dei tiri contro la morte",
+
+  "BLINDSKILLROLLS.Log.ReadyText": "pronto | nascondi={hide} | muto={mute}"
+}
+>>>>>>> d5abf81 (update)

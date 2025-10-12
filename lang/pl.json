@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "BLINDSKILLROLLS.Module.Init": "Blind Skill Rolls | Init",
   "BLINDSKILLROLLS.Module.Ready": "Blind Skill Rolls | Ready",
@@ -7,3 +8,57 @@
   "BLINDSKILLROLLS.Settings.BlindAll.Hint": "When enabled, all skill checks are Blind GM Rolls unless explicitly disabled per skill.",
   "BLINDSKILLROLLS.Debug.SetRollMode": "Blind Skill Rolls | Forcing roll mode to BLIND for skill: {skill}"
 }
+=======
+{
+  "BLINDSKILLROLLS.NPC.Unknown": "Nieznany",
+
+  "BLINDSKILLROLLS.Settings.Enabled.Name": "Włącz ukryte testy umiejętności",
+
+  "BSR.SettingsGroup.Skills.Legend": "Ukryte testy umiejętności",
+  "BSR.SettingsGroup.Skills.Hint": "Wybierz, które umiejętności wymuszać jako „Ukryty rzut MG”.",
+  "BSR.UI.Skills": "Umiejętności",
+  "BSR.UI.All": "Wszystko",
+  "BSR.UI.None": "Brak",
+  "BSR.UI.Defaults": "Domyślne",
+  "BSR.Menu.Skills.Name": "Konfiguruj ukryte testy umiejętności",
+  "BSR.Menu.Skills.Label": "włącz/wyłącz konkretne umiejętności",
+  "BSR.UI.Cancel": "Anuluj",
+  "BSR.UI.Save": "Zapisz",
+
+  "BSR.Settings.DSNGhostDice.Name": "Dice So Nice: kości-duchy",
+  "BSR.Settings.DSNGhostDice.Hint": "Pozostaw kości-duchy widoczne tylko dla autora rzutu (zalecane) lub wyłącz je.",
+  "BSR.Notifications.DSNGhostDiceSet": "Tryb kości-duchów ustawiono na {target}.",
+  "BSR.Errors.DSNNotActive": "Dice So Nice nie jest aktywny.",
+
+  "BLINDSKILLROLLS.Settings.HideForeign.Name": "Ukrywaj obce tajne wiadomości",
+  "BLINDSKILLROLLS.Settings.HideForeign.Hint": "Ukrywaj ślepe/szeptane wiadomości, które nie są do Ciebie skierowane.",
+  "BLINDSKILLROLLS.Settings.MuteForeign.Name": "Wycisz dźwięki obcych rzutów",
+  "BLINDSKILLROLLS.Settings.MuteForeign.Hint": "Wyłącz dźwięki kości dla tajnych rzutów innych graczy.",
+  "BLINDSKILLROLLS.Settings.GmSanitize.Name": "Oczyszczaj publiczne rzuty MG",
+  "BLINDSKILLROLLS.Settings.TrustedDetails.Name": "Zaufani użytkownicy widzą szczegóły",
+
+  "BLINDSKILLROLLS.Section.ChatDisplay": "Wyświetlanie czatu i prywatność (MG)",
+  "BSR.Menu.Chat.Name": "Konfiguruj wyświetlanie czatu",
+  "BSR.Menu.Chat.Label": "widoczność wiadomości czatu",
+
+  "BSR.Menu.GMRolls.Legend": "Rzuty MG",
+
+  "BLINDSKILLROLLS.Section.NPC": "Maskowanie BN",
+  "BLINDSKILLROLLS.Settings.NpcMaskDefault.Name": "Ukrywaj nazwy BN przed graczami (Ta opcja nie działa w tej chwili, zawsze włączona)",
+  "BLINDSKILLROLLS.Settings.NpcMaskDefault.Hint": "Po włączeniu nazwy BN są maskowane, dopóki nie zostaną ujawnione.",
+  "BLINDSKILLROLLS.Settings.NpcReplacement.Name": "Zastępcza nazwa BN",
+  "BLINDSKILLROLLS.Settings.NpcReplacement.Hint": "Nazwa wyświetlana graczom zamiast prawdziwej nazwy BN.",
+  "BLINDSKILLROLLS.Menu.Chat.Note": "-",
+
+  "BLINDSKILLROLLS.Section.DeathSaves": "Testy przeciw śmierci",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.Name": "Widoczność testów przeciw śmierci",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.Hint": "Wybierz sposób publikacji: publiczne, prywatne do MG lub ślepe (tylko MG).",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.public": "Publiczne (wszyscy widzą rzut)",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.privatroll": "Prywatne do MG (autor + MG)",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.blindroll": "Ślepe do MG (tylko MG)",
+  "BSR.Menu.DeathSaves.Name": "Konfiguruj testy przeciw śmierci",
+  "BSR.Menu.DeathSaves.Label": "widoczność testów przeciw śmierci",
+
+  "BLINDSKILLROLLS.Log.ReadyText": "gotowe | ukryj={hide} | wycisz={mute}"
+}
+>>>>>>> d5abf81 (update)

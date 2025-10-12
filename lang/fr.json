@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "BLINDSKILLROLLS.Module.Init": "Blind Skill Rolls | Init",
   "BLINDSKILLROLLS.Module.Ready": "Blind Skill Rolls | Ready",
@@ -7,3 +8,57 @@
   "BLINDSKILLROLLS.Settings.BlindAll.Hint": "When enabled, all skill checks are Blind GM Rolls unless explicitly disabled per skill.",
   "BLINDSKILLROLLS.Debug.SetRollMode": "Blind Skill Rolls | Forcing roll mode to BLIND for skill: {skill}"
 }
+=======
+{
+  "BLINDSKILLROLLS.NPC.Unknown": "Inconnu",
+
+  "BLINDSKILLROLLS.Settings.Enabled.Name": "Activer les jets cachés de compétences",
+
+  "BSR.SettingsGroup.Skills.Legend": "Jets de compétence en secret",
+  "BSR.SettingsGroup.Skills.Hint": "Choisissez quelles compétences doivent être forcées en « Jet caché MJ ».",
+  "BSR.UI.Skills": "Compétences",
+  "BSR.UI.All": "Tout",
+  "BSR.UI.None": "Aucun",
+  "BSR.UI.Defaults": "Par défaut",
+  "BSR.Menu.Skills.Name": "Configurer les jets cachés de compétences",
+  "BSR.Menu.Skills.Label": "activer/désactiver des compétences spécifiques",
+  "BSR.UI.Cancel": "Annuler",
+  "BSR.UI.Save": "Enregistrer",
+
+  "BSR.Settings.DSNGhostDice.Name": "Dice So Nice : dés fantômes",
+  "BSR.Settings.DSNGhostDice.Hint": "Conserver les dés fantômes visibles uniquement pour l’auteur du jet (recommandé) ou les désactiver.",
+  "BSR.Notifications.DSNGhostDiceSet": "Mode des dés fantômes défini sur {target}.",
+  "BSR.Errors.DSNNotActive": "Dice So Nice n’est pas actif.",
+
+  "BLINDSKILLROLLS.Settings.HideForeign.Name": "Masquer les messages secrets étrangers",
+  "BLINDSKILLROLLS.Settings.HideForeign.Hint": "Masquer les messages cachés/chuchotés qui ne vous sont pas adressés.",
+  "BLINDSKILLROLLS.Settings.MuteForeign.Name": "Couper le son des dés étrangers",
+  "BLINDSKILLROLLS.Settings.MuteForeign.Hint": "Supprimer les sons de dés pour les jets secrets d’autres joueurs.",
+  "BLINDSKILLROLLS.Settings.GmSanitize.Name": "Nettoyer les jets publics du MJ",
+  "BLINDSKILLROLLS.Settings.TrustedDetails.Name": "Les utilisateurs de confiance voient les détails",
+
+  "BLINDSKILLROLLS.Section.ChatDisplay": "Affichage du chat & confidentialité (MJ)",
+  "BSR.Menu.Chat.Name": "Configurer l’affichage du chat",
+  "BSR.Menu.Chat.Label": "visibilité des messages du chat",
+
+  "BSR.Menu.GMRolls.Legend": "Jets du MJ",
+
+  "BLINDSKILLROLLS.Section.NPC": "Masquage des PNJ",
+  "BLINDSKILLROLLS.Settings.NpcMaskDefault.Name": "Masquer les noms des PNJ aux joueurs (Cette case à cocher n’est pas fonctionnelle pour le moment, toujours activée)",
+  "BLINDSKILLROLLS.Settings.NpcMaskDefault.Hint": "Lorsque activé, les noms des PNJ sont masqués pour les joueurs jusqu’à révélation.",
+  "BLINDSKILLROLLS.Settings.NpcReplacement.Name": "Nom de remplacement PNJ",
+  "BLINDSKILLROLLS.Settings.NpcReplacement.Hint": "Nom affiché aux joueurs à la place du nom réel du PNJ.",
+  "BLINDSKILLROLLS.Menu.Chat.Note": "-",
+
+  "BLINDSKILLROLLS.Section.DeathSaves": "Jets de sauvegarde contre la mort",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.Name": "Visibilité des sauvegardes contre la mort",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.Hint": "Choisissez comment publier ces jets : public, privé au MJ, ou caché (MJ seul).",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.public": "Public (tout le monde voit le jet)",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.privatroll": "Jet privé au MJ (auteur + MJ)",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.blindroll": "Jet caché au MJ (MJ seul)",
+  "BSR.Menu.DeathSaves.Name": "Configurer les sauvegardes contre la mort",
+  "BSR.Menu.DeathSaves.Label": "visibilité des sauvegardes contre la mort",
+
+  "BLINDSKILLROLLS.Log.ReadyText": "prêt | masquer={hide} | muet={mute}"
+}
+>>>>>>> d5abf81 (update)

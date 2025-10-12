@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "BLINDSKILLROLLS.Module.Init": "Blind Skill Rolls | Init",
   "BLINDSKILLROLLS.Module.Ready": "Blind Skill Rolls | Ready",
@@ -7,3 +8,57 @@
   "BLINDSKILLROLLS.Settings.BlindAll.Hint": "Wenn aktiv, sind alle Skillwürfe Blind GM Roll, außer sie sind pro Skill explizit deaktiviert.",
   "BLINDSKILLROLLS.Debug.SetRollMode": "Blind Skill Rolls | Roll-Modus BLIND für Skill: {skill}"
 }
+=======
+{
+  "BLINDSKILLROLLS.NPC.Unknown": "Unbekannt",
+
+  "BLINDSKILLROLLS.Settings.Enabled.Name": "Blind Skill Rolls aktivieren",
+
+  "BSR.SettingsGroup.Skills.Legend": "Blind Skill Rolls",
+  "BSR.SettingsGroup.Skills.Hint": "Wähle, welche Fertigkeiten immer als Blind GM Roll gewürfelt werden.",
+  "BSR.UI.Skills": "Fertigkeiten",
+  "BSR.UI.All": "Alle",
+  "BSR.UI.None": "Keine",
+  "BSR.UI.Defaults": "Standard",
+  "BSR.Menu.Skills.Name": "Blind Skill Rolls konfigurieren",
+  "BSR.Menu.Skills.Label": "einzelne Fertigkeiten an/aus",
+  "BSR.UI.Cancel": "Abbrechen",
+  "BSR.UI.Save": "Speichern",
+
+  "BSR.Settings.DSNGhostDice.Name": "Dice So Nice: Geisterwürfel",
+  "BSR.Settings.DSNGhostDice.Hint": "Geisterwürfel nur für den Werfer sichtbar halten (empfohlen) oder global deaktivieren.",
+  "BSR.Notifications.DSNGhostDiceSet": "Geisterwürfel-Modus gesetzt auf {target}.",
+  "BSR.Errors.DSNNotActive": "Dice So Nice ist nicht aktiv.",
+
+  "BLINDSKILLROLLS.Settings.HideForeign.Name": "Fremde Geheimnachrichten ausblenden",
+  "BLINDSKILLROLLS.Settings.HideForeign.Hint": "Blinde/Flüster-Nachrichten ausblenden, die nicht an die aktuelle Person gerichtet sind.",
+  "BLINDSKILLROLLS.Settings.MuteForeign.Name": "Fremde Würfelsounds stummschalten",
+  "BLINDSKILLROLLS.Settings.MuteForeign.Hint": "Würfelsounds für Geheimwürfe anderer Spieler:innen unterdrücken.",
+  "BLINDSKILLROLLS.Settings.GmSanitize.Name": "Öffentliche SL-Würfe bereinigen",
+  "BLINDSKILLROLLS.Settings.TrustedDetails.Name": "Vertrauenswürdige sehen Details",
+
+  "BLINDSKILLROLLS.Section.ChatDisplay": "Chat-Anzeige & Privatsphäre (SL)",
+  "BSR.Menu.Chat.Name": "Chat-Anzeige konfigurieren",
+  "BSR.Menu.Chat.Label": "Sichtbarkeit von Chat-Nachrichten",
+
+  "BSR.Menu.GMRolls.Legend": "SL-Würfe",
+
+  "BLINDSKILLROLLS.Section.NPC": "NPC-Maskierung",
+  "BLINDSKILLROLLS.Settings.NpcMaskDefault.Name": "NPC-Namen vor Spieler:innen verbergen (Dieses Kontrollkästchen ist momentan nicht funktionsfähig, immer aktiviert)",
+  "BLINDSKILLROLLS.Settings.NpcMaskDefault.Hint": "Wenn aktiviert, werden NPC-Namen bis zur Freigabe maskiert.",
+  "BLINDSKILLROLLS.Settings.NpcReplacement.Name": "NPC-Platzhaltername",
+  "BLINDSKILLROLLS.Settings.NpcReplacement.Hint": "Dieser Platzhalter wird Spieler:innen anstelle des echten NPC-Namens angezeigt.",
+  "BLINDSKILLROLLS.Menu.Chat.Note": "-",
+
+  "BLINDSKILLROLLS.Section.DeathSaves": "Todesrettungswürfe",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.Name": "Sichtbarkeit der Todesrettungswürfe",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.Hint": "Lege fest, wie Todesrettungswürfe gepostet werden: öffentlich, privat (SL+Werfer) oder blind (nur SL).",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.public": "Öffentlich (alle sehen den Wurf)",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.privatroll": "Private SL-Nachricht (Werfer + SL)",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.blindroll": "Blinde SL-Nachricht (nur SL)",
+  "BSR.Menu.DeathSaves.Name": "Todesrettungswürfe konfigurieren",
+  "BSR.Menu.DeathSaves.Label": "Sichtbarkeit von Todesrettungswürfen",
+
+  "BLINDSKILLROLLS.Log.ReadyText": "bereit | hide={hide} | mute={mute}"
+}
+>>>>>>> d5abf81 (update)

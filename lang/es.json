@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "BLINDSKILLROLLS.Module.Init": "Blind Skill Rolls | Init",
   "BLINDSKILLROLLS.Module.Ready": "Blind Skill Rolls | Ready",
@@ -7,3 +8,57 @@
   "BLINDSKILLROLLS.Settings.BlindAll.Hint": "When enabled, all skill checks are Blind GM Rolls unless explicitly disabled per skill.",
   "BLINDSKILLROLLS.Debug.SetRollMode": "Blind Skill Rolls | Forcing roll mode to BLIND for skill: {skill}"
 }
+=======
+{
+  "BLINDSKILLROLLS.NPC.Unknown": "Desconocido",
+
+  "BLINDSKILLROLLS.Settings.Enabled.Name": "Activar tiradas ciegas de habilidades",
+
+  "BSR.SettingsGroup.Skills.Legend": "Tiradas de habilidad en oculto",
+  "BSR.SettingsGroup.Skills.Hint": "Elige qué habilidades se fuerzan como «Tirada ciega del DJ».",
+  "BSR.UI.Skills": "Habilidades",
+  "BSR.UI.All": "Todas",
+  "BSR.UI.None": "Ninguna",
+  "BSR.UI.Defaults": "Predeterminado",
+  "BSR.Menu.Skills.Name": "Configurar tiradas ciegas de habilidades",
+  "BSR.Menu.Skills.Label": "activar/desactivar habilidades específicas",
+  "BSR.UI.Cancel": "Cancelar",
+  "BSR.UI.Save": "Guardar",
+
+  "BSR.Settings.DSNGhostDice.Name": "Dice So Nice: dados fantasma",
+  "BSR.Settings.DSNGhostDice.Hint": "Mantener los dados fantasma visibles solo para el autor del tiro (recomendado) o desactivarlos.",
+  "BSR.Notifications.DSNGhostDiceSet": "Modo de dados fantasma establecido en {target}.",
+  "BSR.Errors.DSNNotActive": "Dice So Nice no está activo.",
+
+  "BLINDSKILLROLLS.Settings.HideForeign.Name": "Ocultar mensajes secretos ajenos",
+  "BLINDSKILLROLLS.Settings.HideForeign.Hint": "Oculta mensajes ciegos/susurros que no van dirigidos al jugador actual.",
+  "BLINDSKILLROLLS.Settings.MuteForeign.Name": "Silenciar sonidos de dados ajenos",
+  "BLINDSKILLROLLS.Settings.MuteForeign.Hint": "Suprime los sonidos de dados de tiradas secretas de otros jugadores.",
+  "BLINDSKILLROLLS.Settings.GmSanitize.Name": "Limpiar tiradas públicas del DJ",
+  "BLINDSKILLROLLS.Settings.TrustedDetails.Name": "Usuarios de confianza ven detalles",
+
+  "BLINDSKILLROLLS.Section.ChatDisplay": "Vista de chat y privacidad (DJ)",
+  "BSR.Menu.Chat.Name": "Configurar vista de chat",
+  "BSR.Menu.Chat.Label": "visibilidad de mensajes de chat",
+
+  "BSR.Menu.GMRolls.Legend": "Tiradas del DJ",
+
+  "BLINDSKILLROLLS.Section.NPC": "Enmascarar PNJ",
+  "BLINDSKILLROLLS.Settings.NpcMaskDefault.Name": "Ocultar nombres de PNJ a los jugadores (Esta casilla no es funcional en este momento, siempre está activada)",
+  "BLINDSKILLROLLS.Settings.NpcMaskDefault.Hint": "Si está activo, los nombres de PNJ se ocultan hasta ser revelados.",
+  "BLINDSKILLROLLS.Settings.NpcReplacement.Name": "Nombre de marcador de PNJ",
+  "BLINDSKILLROLLS.Settings.NpcReplacement.Hint": "Nombre mostrado a los jugadores en lugar del real.",
+  "BLINDSKILLROLLS.Menu.Chat.Note": "-",
+
+  "BLINDSKILLROLLS.Section.DeathSaves": "Tiradas de salvación contra la muerte",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.Name": "Visibilidad de las salvaciones contra la muerte",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.Hint": "Elige cómo publicarlas: público, privado al DJ o ciego (solo DJ).",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.public": "Público (todos ven la tirada)",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.privatroll": "Privado al DJ (autor + DJ)",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.blindroll": "Ciego del DJ (solo DJ)",
+  "BSR.Menu.DeathSaves.Name": "Configurar salvaciones contra la muerte",
+  "BSR.Menu.DeathSaves.Label": "visibilidad de las salvaciones contra la muerte",
+
+  "BLINDSKILLROLLS.Log.ReadyText": "listo | ocultar={hide} | silenciar={mute}"
+}
+>>>>>>> d5abf81 (update)
