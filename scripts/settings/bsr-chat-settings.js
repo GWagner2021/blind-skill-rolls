@@ -259,4 +259,5 @@
   Hooks.on("renderChatLogConfig", injectChatDisplayControls);
   Hooks.on("renderChatDisplayConfig", injectChatDisplayControls);
   Hooks.on("renderChatConfig", injectChatDisplayControls);
+
 })();

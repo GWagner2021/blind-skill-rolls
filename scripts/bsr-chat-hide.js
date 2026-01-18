@@ -285,7 +285,7 @@
     patchHTMLAudioPlay();
   }
 
-  // Gate-Trigger 
+  // Gate-Trigger
   Hooks.on("preCreateChatMessage", (_doc, data)=>{
     try{
       if (game.user.isGM || !OPT_MUTE()) return;
@@ -328,4 +328,24 @@
   });
 
   Hooks.on("renderChatLog", () => { applyCssGuard(); observeSidebar(); setTimeout(sweepAllRoots, 0); });
+
+  function removeBlind(){
+      const elements = document.querySelectorAll(".hidden_msg");
+      elements.forEach(el => {
+        el.remove();
+      });
+    }
+
+    Hooks.on("renderChatMessageHTML", (message, html, data) => {
+        
+        if(!game.user.isGM){
+          if(message.blind  && game.settings.get(MOD, "blindRollersChat") && message.flavor != "Death Saving Throw")  {html.classList.add("hidden_msg");}
+          if(message.blind  && game.settings.get(MOD, "blindRollersDeathSaveChat") && message.flavor == "Death Saving Throw") {html.classList.add("hidden_msg");}
+          removeBlind();
+
+        }
+      });
+    Hooks.on("canvasPan", (...args) => {
+      removeBlind();
+    });
 })();

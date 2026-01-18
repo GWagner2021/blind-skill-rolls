@@ -1,6 +1,37 @@
 ## [Unreleased]
 _TBD_
 
+## [1.1.0] - 2026-01-18
+### Changed
+- **Unified Dice So Nice behaviour for blind/private rolls**  
+  Ensured that, regardless of how the roll is triggered (core dnd5e roll, MidiQOL roll, or a roll intercepted and re-created as a blind GM roll by the module), **Dice So Nice** shows the correct dice to the correct recipients:
+  - **Private Death Saves** (`DeathSavesMode = privateroll`):
+    - Roller: normal dice + chat message  
+    - GM: normal dice + chat message  
+    - Other players: nothing  
+  - **Blind Death Saves** (`DeathSavesMode = blindroll`):
+    - Roller: ghost/partial dice view  
+    - GM: normal dice + chat message  
+    - Other players: nothing  
+  - **Forced Blind Skills**:
+    - Roller: ghost/partial dice view + limited chat (depending on settings)  
+    - GM: normal dice + chat message  
+    - Other players: nothing  
+
+- **Compatibility with and without MidiQOL**  
+  The above behaviour was explicitly aligned to work:
+  - with **MidiQOL** installed and active,  
+  - without **MidiQOL**,  
+  - and also when **MidiQOL’s “Fast Forward Ability Rolls”** option is enabled.
+
+### Added
+- **Blind Death Saves message settings**  
+  - New setting to allow **blind death save chat messages to be hidden from the roller**, while the GM still sees the full message and other players see nothing.
+  - Corresponding GUI controls in the Death Saves configuration dialog.
+
+- **Blind Skill Rolls message settings**  
+  - New setting to allow **blind skill roll chat messages to be hidden from the roller**, matching the death save behaviour.
+  - Corresponding GUI controls in the Blind Skill Rolls configuration dialog.
 
 ## [1.0.1] - 2025-10-11
 ### Added

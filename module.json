@@ -1,7 +1,7 @@
 {
   "id": "blind-skill-rolls",
   "title": "Blind Skill Rolls",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "<p>Automatically sets selected DnD5e skill checks to Blind GM Roll. </p><p>Setzt ausgewählte DnD5e-Skillwürfe automatisch als Blind GM Roll.</p>",
   "compatibility": {
     "minimum": "13",
@@ -33,6 +33,7 @@
     { "lang": "fr", "name": "Français", "path": "lang/fr.json", "flags": {} },
     { "lang": "es", "name": "Español",  "path": "lang/es.json", "flags": {} },
     { "lang": "it", "name": "Italiano", "path": "lang/it.json", "flags": {} },
+    { "lang": "ru", "name": "Russian",  "path": "lang/ru.json", "flags": {} },
     { "lang": "pl", "name": "Polski",   "path": "lang/pl.json", "flags": {} }
   ],
 "scripts": [
@@ -48,11 +49,13 @@
   "scripts/bsr-gm-privacy.js",
   "scripts/bsr-npc-reveal.js"
 ],
+"styles": ["style.css"],
+"socket": true,
   "url": "https://github.com/GWagner2021/blind-skill-rolls",
   "bugs": "https://github.com/GWagner2021/blind-skill-rolls/issues",
   "readme": "https://github.com/GWagner2021/blind-skill-rolls#readme",
   "license": "https://github.com/GWagner2021/blind-skill-rolls/blob/main/LICENSE",
   "changelog": "https://github.com/GWagner2021/blind-skill-rolls/blob/main/CHANGELOG.md",
   "manifest": "https://github.com/GWagner2021/blind-skill-rolls/releases/latest/download/module.json",
-  "download": "https://github.com/GWagner2021/blind-skill-rolls/releases/latest/download/blind-skill-rolls.zip"
+  "download": "https://github.com/GWagner2021/blind-skill-rolls/releases/download/v1.1.0/blind-skill-rolls.zip"
 }

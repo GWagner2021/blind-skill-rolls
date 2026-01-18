@@ -25,9 +25,21 @@
       default: "blindroll"
     });
 
+    game.settings.register(MOD, "blindRollersDeathSaveChat", {
+       name: "Blind Roller's Death Saves Chat",
+       hint: "Hides blind  death saves chat messages from the roller as well.",
+       scope: "world",
+       config: false,
+       type: Boolean,
+       default: true
+     });
+
     class BSRMenuDeathSaves extends FormApplication {
       render() {
         const mode = String(game.settings.get(MOD, "bsrDeathSavesMode") || "blindroll").toLowerCase();
+        const blindRollersDeathSaveChat = game.settings.get(MOD, "blindRollersDeathSaveChat");
+
+
 
         const content = `
           <form style="min-width: 560px;">
@@ -52,6 +64,17 @@
                 </select>
               </div>
             </fieldset>
+            <fieldset style="margin-bottom: 12px;">
+              <legend>${L("BLINDSKILLROLLS.Section.DeathSaves","Hide Death Saves Rolls Chats From The Roller")}</legend>
+              <label style="display:flex; gap:.5rem; align-items:center;">
+                  <input type="checkbox" name="blindRollersDeathSaveChat" ${blindRollersDeathSaveChat ? "checked" : ""}></input>
+                <span>${L("BLINDSKILLROLLS.Settings.DeathSaves.blindRollersDeathSaveChat.Name","Hide the roller's own blind death saves chat messages")}</span>
+              </label>
+              <p style="margin:.35rem 0 0; color: var(--color-text-dark-secondary);">
+                ${L("BLINDSKILLROLLS.Settings.DeathSaves.blindRollersDeathSaveChat.Hint","Hide the roller's own blind death saves chat messages.")}
+              </p>
+              </fieldset>
+
           </form>
         `;
 
@@ -68,6 +91,7 @@
                   const f    = root.querySelector("form");
                   const sel  = f?.dsMode?.value || "blindroll";
                   await game.settings.set(MOD, "bsrDeathSavesMode", sel);
+                  await game.settings.set(MOD, "blindRollersDeathSaveChat", !!f.blindRollersDeathSaveChat.checked);
                   log("| death saves mode ->", sel);
                 } catch (e) {
                   warn("| saving death saves mode failed", e);

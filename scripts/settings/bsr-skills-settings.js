@@ -23,6 +23,14 @@
       name: L("BLINDSKILLROLLS.Settings.Enabled.Name","Enable Blind Skill Rolls"),
       scope: "world", config: false, restricted: true, type: Boolean, default: true
     });
+    game.settings.register(MOD, "blindRollersChat", {
+      name: "Blind Roller's Chat",
+      hint: "Hides blind skill rolls chat messages from the roller as well.",
+      scope: "world",
+      config: false,
+      type: Boolean,
+      default: true
+    });
   });
 
   function registerSkillSettings() {
@@ -57,7 +65,7 @@
 
       const enabled = game.settings.get(MOD, "enabled");
       const defaults = new Set(["arc","dec","his","ins","inv","med","nat","prc","per","rel","slt","ste","sur"]);
-
+      const blindRollersChat =  !!game.settings.get(MOD, "blindRollersChat");
       const content = `
         <form class="bsr-form" style="min-width: 580px; padding-right:.25rem;">
           <fieldset style="margin-bottom: 12px;">
@@ -70,6 +78,18 @@
               ${L("BSR.SettingsGroup.Skills.Hint","Choose which skills should be forced to Blind GM Roll.")}
             </p>
           </fieldset>
+
+          <fieldset style="margin-bottom: 12px;">
+            <legend>${L("BSR.SettingsGroup.Skills.Legend","Hide Blind Skill Rolls Chats From The Roller")}</legend>
+            <label style="display:flex; gap:.5rem; align-items:center;">
+                <input type="checkbox" name="blindRollersChat" ${blindRollersChat ? "checked" : ""}></input>
+              <span>${L("BLINDSKILLROLLS.Settings.BlindRollersChat.Name","Hide roller's blind chat messages")}</span>
+            </label>
+            <p style="margin:.35rem 0 0; color: var(--color-text-dark-secondary);">
+              ${L("BSR.SettingsGroup.BlindRollersChat.Hint","Hide roller's blind chat messages.")}
+            </p>
+            </fieldset>
+
 
           <div style="display:flex; justify-content:space-between; align-items:center; margin:.5rem 0;">
             <strong>${L("BSR.UI.Skills","Skills")}</strong>
@@ -107,6 +127,7 @@
                 pairs.push([i.dataset.skill, i.checked]);
               });
               await setMany(pairs);
+              await game.settings.set(MOD, "blindRollersChat", !!form.blindRollersChat.checked);
             }
           }
         }
