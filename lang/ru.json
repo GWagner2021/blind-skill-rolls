@@ -1,0 +1,52 @@
+{
+  "BLINDSKILLROLLS.NPC.Unknown": "Неизвестно",
+
+  "BLINDSKILLROLLS.Settings.Enabled.Name": "Включить Blind Skill Rolls",
+
+  "BSR.SettingsGroup.Skills.Legend": "Blind Skill Rolls",
+  "BSR.SettingsGroup.Skills.Hint": "Выберите, какие навыки должны принудительно бросаться как «Слепой бросок Мастеру».",
+  "BSR.UI.Skills": "Навыки",
+  "BSR.UI.All": "Все",
+  "BSR.UI.None": "Ничего",
+  "BSR.UI.Defaults": "По умолчанию",
+  "BSR.Menu.Skills.Name": "Настроить Blind Skill Rolls",
+  "BSR.Menu.Skills.Label": "Включить/Отключить отдельные навыки",
+  "BSR.UI.Cancel": "Отмена",
+  "BSR.UI.Save": "Сохранить",
+
+  "BSR.Settings.DSNGhostDice.Name": "Dice So Nice: режим призрачных костей",
+  "BSR.Settings.DSNGhostDice.Hint": "Оставлять призрачные кости видимыми только автору броска (рекомендуется) или отключить их глобально.",
+  "BSR.Notifications.DSNGhostDiceSet": "Режим призрачных костей установлен: {target}.",
+  "BSR.Errors.DSNNotActive": "Dice So Nice не активен.",
+
+  "BLINDSKILLROLLS.Settings.HideForeign.Name": "Скрывать чужие секретные сообщения",
+  "BLINDSKILLROLLS.Settings.HideForeign.Hint": "Скрывать слепые/шёпот-сообщения, не адресованные текущему игроку.",
+  "BLINDSKILLROLLS.Settings.MuteForeign.Name": "Отключать чужие звуки бросков",
+  "BLINDSKILLROLLS.Settings.MuteForeign.Hint": "Подавлять звуки для секретных бросков, сделанных другими игроками.",
+  "BLINDSKILLROLLS.Settings.GmSanitize.Name": "Скрывать детали публичных бросков Мастера",
+  "BLINDSKILLROLLS.Settings.TrustedDetails.Name": "Доверенные пользователи видят детали",
+
+  "BLINDSKILLROLLS.Section.ChatDisplay": "Отображение чата и приватность",
+  "BSR.Menu.Chat.Name": "Настроить отображение чата",
+  "BSR.Menu.Chat.Label": "Видимость сообщений чата",
+
+  "BSR.Menu.GMRolls.Legend": "Броски Мастера",
+
+  "BLINDSKILLROLLS.Section.NPC": "Маскировка НИП",
+  "BLINDSKILLROLLS.Settings.NpcMaskDefault.Name": "Скрывать имена НИП от игроков (этот флажок сейчас не работает, всегда включено)",
+  "BLINDSKILLROLLS.Settings.NpcMaskDefault.Hint": "Если включено, имена НИП маскируются для игроков до раскрытия.",
+  "BLINDSKILLROLLS.Settings.NpcReplacement.Name": "Имя-заглушка для НИП",
+  "BLINDSKILLROLLS.Settings.NpcReplacement.Hint": "Заглушка, показываемая игрокам вместо настоящего имени НИП.",
+  "BLINDSKILLROLLS.Menu.Chat.Note": "-",
+
+  "BLINDSKILLROLLS.Section.DeathSaves": "Спасброски от смерти",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.Name": "Видимость спасбросков от смерти",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.Hint": "Выберите, как публиковать спасброски от смерти: публично, приватно Мастеру или вслепую (только Мастер).",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.public": "Публично (все видят бросок)",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.privatroll": "Приватный бросок Мастеру (автор + Мастер)",
+  "BLINDSKILLROLLS.Settings.DeathSaves.Mode.blindroll": "Слепой бросок Мастера (только Мастер)",
+  "BSR.Menu.DeathSaves.Name": "Настроить спасброски от смерти",
+  "BSR.Menu.DeathSaves.Label": "видимость спасбросков от смерти",
+
+  "BLINDSKILLROLLS.Log.ReadyText": "готово | hide={hide} | mute={mute}"
+}
