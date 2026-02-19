@@ -1,4 +1,4 @@
-// scripts/npc-reveal-live.js
+// scripts/bsr-npc-reveal.js
 
 (() => {
   "use strict";
@@ -18,6 +18,13 @@
     return "Unknown";
   }
 
+  function L(key, fallback) {
+    try {
+      if (game.i18n?.has?.(key)) return game.i18n.localize(key);
+    } catch {}
+    return fallback ?? key;
+  }
+
   // ----------------------------- Utils --------------------------------
   const isGM = () => !!game.user?.isGM;
   const uniq = (arr) => Array.from(new Set(arr));
@@ -29,19 +36,39 @@
     catch { return null; }
   }
 
+  function resolveTokenFromKeys(keys) {
+
+    const uuidKey = keys.find(k => k.startsWith("t:")) || keys.find(k => k.startsWith("u:"));
+    if (uuidKey) {
+      const doc = docFromUuidSync(uuidKey.slice(2));
+
+      if (doc?.documentName === "Token") return doc;
+      if (doc?.parent?.documentName === "Token") return doc.parent;
+    }
+
+    const tidKey = keys.find(k => k.startsWith("tid:"));
+    if (tidKey && canvas?.scene) {
+      const tid = tidKey.slice(4);
+      const uuid = `Scene.${canvas.scene.id}.Token.${tid}`;
+      const doc = docFromUuidSync(uuid);
+      if (doc?.documentName === "Token") return doc;
+    }
+
+    return null;
+  }
+
   function resolveActorFromKeys(keys) {
     const aid = (keys.find(k => k.startsWith("aid:")) || "").slice(4) || null;
     if (aid) {
       const a = getActorById(aid);
       if (a) return a;
     }
-    const tKey = keys.find(k => k.startsWith("t:")) || keys.find(k => k.startsWith("u:"));
-    if (tKey) {
-      const uu = tKey.slice(2);
-      const doc = docFromUuidSync(uu);
-      if (doc?.documentName === "Token") return doc.actor ?? null;
-      if (doc?.documentName === "Actor") return doc;
+
+    const uuidKey = keys.find(k => k.startsWith("t:")) || keys.find(k => k.startsWith("u:"));
+    if (uuidKey) {
+      const doc = docFromUuidSync(uuidKey.slice(2));
       if (doc?.actor) return doc.actor;
+      if (doc?.documentName === "Actor") return doc;
     }
     return null;
   }
@@ -75,32 +102,84 @@
     if (keys.length) li.dataset.bsrKeys = JSON.stringify(uniq(keys));
   }
 
-  function shouldMaskByDefault(actor) {
-    if (!actor) return true;
-    if (actor.type === "character") return false;
+
+  function isPureGMRoll(keys, message) {
+
+    const hasActorKeys = keys.some(k =>
+      k.startsWith("aid:") ||
+      k.startsWith("a:") ||
+      k.startsWith("tid:") ||
+      k.startsWith("t:") ||
+      k.startsWith("u:")
+    );
+
+    if (hasActorKeys) {
+      return false;
+    }
+
+    const hasActorDoc = !!message?.actor;
+    const hasActorInSpeaker = !!(message?.speaker?.actor || message?.speaker?.token);
+
+    if (hasActorDoc || hasActorInSpeaker) {
+      return false;
+    }
+
     return true;
+  }
+
+  function shouldMaskByDefault(actor) {
+    if (!actor) {
+
+      try {
+        const setting = !!game.settings.get(MOD, "bsrNpcMaskDefault");
+        return setting;
+      } catch (e) {
+        return true;
+      }
+    }
+
+    if (actor.type === "character") {
+      return false;
+    }
+
+    try {
+      const maskingEnabled = !!game.settings.get(MOD, "bsrNpcMaskDefault");
+      return maskingEnabled;
+    } catch (e) {
+
+
+      return true;
+    }
   }
 
   function isRevealedForKeys(keys) {
     try {
-      const tKey = keys.find(k => k.startsWith("t:")) || keys.find(k => k.startsWith("u:"));
-      if (tKey) {
-        const tuuid = tKey.slice(2);
-        const tok = docFromUuidSync(tuuid);
-        const tflag = tok?.getFlag?.(FLAG_SCOPE, FLAG_KEY_REVEALED);
-        if (typeof tflag === "boolean") return tflag;
+      const globalMaskingEnabled = !!game.settings.get(MOD, "bsrNpcMaskDefault");
+      if (!globalMaskingEnabled) {
+        return true;
       }
-    } catch {}
+    } catch (e) {
+
+    }
+
+    const token = resolveTokenFromKeys(keys);
+    if (token) {
+      try {
+        const tflag = token.getFlag?.(FLAG_SCOPE, FLAG_KEY_REVEALED);
+        if (typeof tflag === "boolean") {
+          return tflag;
+        }
+      } catch {}
+      const actor = token.actor ?? resolveActorFromKeys(keys);
+      const shouldMask = shouldMaskByDefault(actor);
+      const result = !shouldMask;
+      return result;
+    }
 
     const actor = resolveActorFromKeys(keys);
-    if (actor) {
-      try {
-        const aflag = actor.getFlag(FLAG_SCOPE, FLAG_KEY_REVEALED);
-        if (typeof aflag === "boolean") return aflag;
-      } catch {}
-      return !shouldMaskByDefault(actor);
-    }
-    return false;
+    const shouldMask = shouldMaskByDefault(actor);
+    const result = !shouldMask;
+    return result;
   }
 
   const clientShouldSeeRealName = () => isGM();
@@ -111,6 +190,18 @@
     if (!titleEl) return;
 
     const keys = safeParse(li.dataset.bsrKeys || "[]", []);
+
+    if (isPureGMRoll(keys, msg)) {
+
+      if (!li.dataset.bsrRealName) {
+        const real = (msg?.speaker?.alias ?? titleEl.textContent ?? "").trim();
+        if (real) li.dataset.bsrRealName = real;
+      }
+      setTitle(li, titleEl, li.dataset.bsrRealName || titleEl.textContent);
+      li.removeAttribute("data-bsr-masked");
+      return;
+    }
+
     if (!keys.length) return;
 
     const actor = resolveActorFromKeys(keys);
@@ -118,6 +209,8 @@
       const real = (msg?.speaker?.alias ?? titleEl.textContent ?? "").trim();
       if (real) li.dataset.bsrRealName = real;
     }
+
+    const actorName = li.dataset.bsrRealName || (keys.find(k => k.startsWith("n:")) || "").slice(2) || "Unknown";
 
     if (actor?.type === "character") {
       setTitle(li, titleEl, li.dataset.bsrRealName || (keys.find(k => k.startsWith("n:")) || "").slice(2) || titleEl.textContent);
@@ -181,9 +274,17 @@
     ro.observe(header);
   }
 
-  // -------------------- GM-Button & Refresh ---------------------------
   function ensureToggleButton(li) {
     if (!isGM()) return;
+
+
+    const keys = safeParse(li.dataset.bsrKeys || "[]", []);
+    const mid = li.dataset.messageId;
+    const msg = game.messages?.get?.(mid);
+    if (isPureGMRoll(keys, msg)) {
+      return;
+    }
+
     const headerMeta = li?.querySelector?.(".message-header .message-metadata");
     if (!headerMeta) return;
     if (headerMeta.querySelector?.("a.bsr-toggle-name")) return;
@@ -192,7 +293,9 @@
     a.className = "bsr-toggle-name";
     a.dataset.action = "bsr-toggle-name";
     a.style.marginRight = "0.25rem";
-    a.setAttribute("aria-label", "Toggle name visibility");
+    const toggleLabel = L("BLINDSKILLROLLS.NPC.ToggleNameVisibility", "Toggle name visibility");
+    a.setAttribute("aria-label", toggleLabel);
+    a.setAttribute("title", toggleLabel);
 
     const i = document.createElement("i");
     i.className = "fa-solid fa-id-badge fa-fw";
@@ -208,15 +311,23 @@
     const revealed = isRevealedForKeys(keys);
     btn.className = revealed ? "fa-solid fa-user-secret fa-fw" : "fa-solid fa-id-badge fa-fw";
     const wrap = btn.closest("a.bsr-toggle-name");
-    if (wrap) wrap.setAttribute("aria-label", revealed ? "Hide name (all)" : "Reveal name (all)");
-  }
+      if (wrap) {
+      const label = revealed
+      ? L("BLINDSKILLROLLS.NPC.HideName", "Hide name")
+      : L("BLINDSKILLROLLS.NPC.RevealName", "Reveal name");
+      wrap.setAttribute("aria-label", label);
+      wrap.setAttribute("title", label);
+      }
+    }
 
   function refreshByKeys(filterKeys = null) {
+
     const list =
       ui?.chat?.element?.querySelector?.("ol.chat-log") ||
       document.querySelector("ol.chat-log");
     if (!list) return;
 
+    let refreshCount = 0;
     list.querySelectorAll(".chat-message[data-message-id]").forEach(li => {
       const keys = safeParse(li.dataset.bsrKeys || "[]", []);
       if (!keys.length) return;
@@ -225,21 +336,39 @@
       const msg = game.messages?.get?.(mid);
       applyMaskedName(msg, li);
       updateButtonIcon(li);
+      refreshCount++;
     });
+
   }
 
   async function toggleRevealFromLi(li) {
     const keys = safeParse(li.dataset.bsrKeys || "[]", []);
-    const actor = resolveActorFromKeys(keys);
-    if (!actor) return;
+    const token = resolveTokenFromKeys(keys);
 
-    const cur = !!actor.getFlag(FLAG_SCOPE, FLAG_KEY_REVEALED);
+    if (!token) {
+      return;
+    }
+
+    const cur = !!token.getFlag(FLAG_SCOPE, FLAG_KEY_REVEALED);
     const next = !cur;
-    await actor.setFlag(FLAG_SCOPE, FLAG_KEY_REVEALED, next);
+    await token.setFlag(FLAG_SCOPE, FLAG_KEY_REVEALED, next);
 
-    refreshByKeys(keys);
+    const tokenKeys = keys.filter(k =>
+      k.startsWith("tid:") || k.startsWith("t:")
+    );
+
+    const uKey = keys.find(k => k.startsWith("u:"));
+    if (uKey) {
+      const doc = docFromUuidSync(uKey.slice(2));
+      if (doc?.documentName === "Token" || doc?.parent?.documentName === "Token") {
+        tokenKeys.push(uKey);
+      }
+    }
+
+    refreshByKeys(tokenKeys.length ? tokenKeys : keys);
+
     try {
-      game.socket?.emit(`module.${MOD}`, { op: "refreshByKeys", keys });
+      game.socket?.emit(`module.${MOD}`, { op: "refreshByKeys", keys: tokenKeys.length ? tokenKeys : keys });
     } catch {}
   }
 
@@ -252,7 +381,7 @@
       installObserver(li);
       updateButtonIcon(li);
     } catch (e) {
-      console.warn("[BSR] npc-reveal-live renderChatMessageHTML failed", e);
+      console.warn(game.i18n.localize("BLINDSKILLROLLS.Log.NPCRLRCMHFailed"), e);
     }
   });
 
@@ -269,29 +398,24 @@
       ev.stopPropagation();
       toggleRevealFromLi(li);
     }, true);
+
     game.socket?.on?.(`module.${MOD}`, (payload) => {
       if (!payload || typeof payload !== "object") return;
       if (payload.op === "refreshByKeys") {
         refreshByKeys(payload.keys || null);
       }
     });
+
+    Hooks.on("updateSetting", (setting) => {
+      if (setting.key === `${MOD}.bsrNpcMaskDefault`) {
+        setTimeout(() => refreshByKeys(null), 50);
+      }
+    });
+
     setTimeout(() => refreshByKeys(null), 50);
 
-    console.log(
-      `%c${MOD}%c | NPC Name reveal ready`,
-      'color:#8B0000;font-weight:700;',
-      'color:inherit;'
-    );
-  });
-
-  Hooks.on("updateActor", (actor, diff) => {
-    try {
-      const fs = diff?.flags?.[FLAG_SCOPE];
-      if (fs && Object.prototype.hasOwnProperty.call(fs, FLAG_KEY_REVEALED)) {
-        const keys = [`aid:${actor.id}`, `a:Actor.${actor.id}`, `n:${actor.name}`];
-        refreshByKeys(keys);
-      }
-    } catch {}
+    window.BSR_102.load_count += 1;
+    BSR_102.load_complete();
   });
 
   Hooks.on("updateToken", (scene, token, diff) => {
@@ -307,4 +431,6 @@
   });
 
   globalThis.BSR_refreshByKeys = refreshByKeys;
+
 })();
+window.BSR_102.load_count += 1;

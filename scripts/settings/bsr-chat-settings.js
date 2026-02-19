@@ -1,4 +1,5 @@
 // scripts/settings/bsr-chat-settings.js
+
 (() => {
   "use strict";
   const MOD = "blind-skill-rolls";
@@ -14,6 +15,9 @@
     try { const t = game?.i18n?.localize?.(k); return (t && t !== k) ? t : (fb ?? k); }
     catch { return fb ?? k; }
   };
+  Hooks.on("ready",() => {
+    window.BSR_102.load_count += 1;
+  });
 
   Hooks.once("init", () => {
     // ---------- Chat-Hide/Mute ----------
@@ -40,129 +44,218 @@
 
     // ---------- NPC-Masken ----------
     game.settings.register(MOD, "bsrNpcMaskDefault", {
-      name: L("BLINDSKILLROLLS.Settings.NpcMaskDefault.Name", "Hide NPC names from players (experimental)"),
+      name: L("BLINDSKILLROLLS.Settings.NpcMaskDefault.Name", "Hide NPC names from players"),
       hint: L("BLINDSKILLROLLS.Settings.NpcMaskDefault.Hint", "When enabled, NPC names are masked for players until revealed."),
       scope: "world", config: false, restricted: true, type: Boolean, default: false
     });
     game.settings.register(MOD, "bsrNpcNameReplacement", {
       name: L("BLINDSKILLROLLS.Settings.NpcReplacement.Name", "NPC placeholder name"),
       hint: L("BLINDSKILLROLLS.Settings.NpcReplacement.Hint", "Placeholder shown to players instead of the real NPC name."),
-      scope: "world", config: false, restricted: true, type: String, default: "Unknown"
+      scope: "world", config: false, restricted: true, type: String, default: ""
     });
 
-    class BSRMenuChatDisplay extends FormApplication {
-      render() {
-        const hide    = !!game.settings.get(MOD, "hideForeignSecrets");
-        const mute    = !!game.settings.get(MOD, "muteForeignSecretSounds");
-        const sanitize= !!game.settings.get(MOD, "bsrSanitizePublicGm");
-        const trusted = !!game.settings.get(MOD, "bsrTrustedSeeDetails");
-        const maskDef = !!game.settings.get(MOD, "bsrNpcMaskDefault");
-        const repl    = game.settings.get(MOD, "bsrNpcNameReplacement") ?? "Unknown";
+    class BSRMenuChatDisplay extends foundry.applications.api.ApplicationV2 {
+      static DEFAULT_OPTIONS = {
+        id: "bsr-chat-display-config",
+        classes: ["bsr-chat-dialog", "bsr-theme"],
+        window: {
+          title: L("BSR.Menu.Chat.Name", "Configure Chat Display"),
+          icon: "fa-solid fa-comments",
+          resizable: true
+        },
+        position: {
+          width: 820,
+          height: "auto"
+        },
+        actions: {
+          save: BSRMenuChatDisplay.prototype._onSaveAction,
+          cancel: BSRMenuChatDisplay.prototype._onCancelAction
+        }
+      };
 
+      async _prepareContext(options) {
+        const context = await super._prepareContext(options);
+
+        return {
+          ...context,
+          hide: !!game.settings.get(MOD, "hideForeignSecrets"),
+          mute: !!game.settings.get(MOD, "muteForeignSecretSounds"),
+          sanitize: !!game.settings.get(MOD, "bsrSanitizePublicGm"),
+          trusted: !!game.settings.get(MOD, "bsrTrustedSeeDetails"),
+          maskDef: !!game.settings.get(MOD, "bsrNpcMaskDefault"),
+          repl: game.settings.get(MOD, "bsrNpcNameReplacement") ?? "",
+          labels: {
+            chatDisplay: L("BLINDSKILLROLLS.Section.ChatDisplay", "Chat Display & Privacy"),
+            hideForeignName: L("BLINDSKILLROLLS.Settings.HideForeign.Name", "Hide foreign secret messages"),
+            hideForeignHint: L("BLINDSKILLROLLS.Settings.HideForeign.Hint", "Hide blind/whisper messages not addressed to the current player."),
+            muteForeignName: L("BLINDSKILLROLLS.Settings.MuteForeign.Name", "Mute foreign dice sounds"),
+            muteForeignHint: L("BLINDSKILLROLLS.Settings.MuteForeign.Hint", "Suppress dice sounds for secret rolls made by other players."),
+            gmRolls: L("BSR.Menu.GMRolls.Legend", "GM Rolls"),
+            sanitizeName: L("BLINDSKILLROLLS.Settings.GmSanitize.Name", "Sanitize public GM rolls"),
+            trustedName: L("BLINDSKILLROLLS.Settings.TrustedDetails.Name", "Trusted users see details"),
+            npcMasking: L("BLINDSKILLROLLS.Section.NPC", "NPC Masking"),
+            npcMaskName: L("BLINDSKILLROLLS.Settings.NpcMaskDefault.Name", "Hide NPC names from players"),
+            npcMaskHint: L("BLINDSKILLROLLS.Settings.NpcMaskDefault.Hint", "When enabled, NPC names are masked for players until revealed."),
+            npcReplName: L("BLINDSKILLROLLS.Settings.NpcReplacement.Name", "NPC placeholder name"),
+            npcReplHint: L("BLINDSKILLROLLS.Settings.NpcReplacement.Hint", "Placeholder shown to players instead of the real NPC name."),
+            note: L("BLINDSKILLROLLS.Menu.Chat.Note", "-"),
+            cancel: L("BSR.UI.Cancel", "Cancel"),
+            save: L("BSR.UI.Save", "Save")
+          }
+        };
+      }
+
+      async _renderHTML(context, options) {
         const content = `
           <form style="min-width: 740px;">
             <fieldset class="form-group">
-              <legend style="font-weight:600;">${L("BLINDSKILLROLLS.Section.ChatDisplay","Chat Display & Privacy (GM)")}</legend>
+              <legend style="font-weight:600;">${context.labels.chatDisplay}</legend>
 
               <div style="display:flex; gap:1rem; flex-wrap:wrap;">
                 <label style="display:flex; gap:.5rem; align-items:center;">
-                  <input type="checkbox" name="hide" ${hide ? "checked":""}>
-                  <span>${L("BLINDSKILLROLLS.Settings.HideForeign.Name","Hide foreign secret messages")}</span>
+                  <input type="checkbox" name="hide" ${context.hide ? "checked" : ""}>
+                  <span>${context.labels.hideForeignName}</span>
                 </label>
 
                 <label style="display:flex; gap:.5rem; align-items:center;">
-                  <input type="checkbox" name="mute" ${mute ? "checked":""}>
-                  <span>${L("BLINDSKILLROLLS.Settings.MuteForeign.Name","Mute foreign dice sounds")}</span>
+                  <input type="checkbox" name="mute" ${context.mute ? "checked" : ""}>
+                  <span>${context.labels.muteForeignName}</span>
                 </label>
               </div>
               <p class="hint" style="margin-top:.35rem;">
-                ${L("BLINDSKILLROLLS.Settings.HideForeign.Hint","Hide blind/whisper messages not addressed to the current player.")}
+                ${context.labels.hideForeignHint}
               </p>
               <p class="hint">
-                ${L("BLINDSKILLROLLS.Settings.MuteForeign.Hint","Suppress dice sounds for secret rolls made by other players.")}
+                ${context.labels.muteForeignHint}
               </p>
             </fieldset>
 
             <hr style="margin:.6rem 0;opacity:.3;">
 
             <fieldset class="form-group">
-              <legend style="font-weight:600;">${L("BSR.Menu.GMRolls.Legend","GM Rolls")}</legend>
+              <legend style="font-weight:600;">${context.labels.gmRolls}</legend>
 
               <label style="display:flex; gap:.5rem; align-items:center;">
-                <input type="checkbox" name="sanitize" ${sanitize ? "checked":""}>
-                <span>${L("BLINDSKILLROLLS.Settings.GmSanitize.Name","Sanitize public GM rolls")}</span>
+                <input type="checkbox" name="sanitize" ${context.sanitize ? "checked" : ""}>
+                <span>${context.labels.sanitizeName}</span>
               </label>
 
               <label style="display:flex; gap:.5rem; align-items:center; margin-top:.35rem;">
-                <input type="checkbox" name="trusted" ${trusted ? "checked":""}>
-                <span>${L("BLINDSKILLROLLS.Settings.TrustedDetails.Name","Trusted users see details")}</span>
+                <input type="checkbox" name="trusted" ${context.trusted ? "checked" : ""}>
+                <span>${context.labels.trustedName}</span>
               </label>
             </fieldset>
 
             <hr style="margin:.6rem 0;opacity:.3;">
 
             <fieldset class="form-group">
-              <legend style="font-weight:600;">${L("BLINDSKILLROLLS.Section.NPC","NPC Masking")}</legend>
+              <legend style="font-weight:600;">${context.labels.npcMasking}</legend>
 
               <label style="display:flex; gap:.5rem; align-items:center;">
-                <input type="checkbox" name="maskDef" ${maskDef ? "checked":""}>
-                <span>${L("BLINDSKILLROLLS.Settings.NpcMaskDefault.Name","Hide NPC names from players")}</span>
+                <input type="checkbox" name="maskDef" ${context.maskDef ? "checked" : ""}>
+                <span>${context.labels.npcMaskName}</span>
               </label>
-              <p class="hint">${L("BLINDSKILLROLLS.Settings.NpcMaskDefault.Hint","When enabled, NPC names are masked for players until revealed.")}</p>
+              <p class="hint">${context.labels.npcMaskHint}</p>
 
               <div style="display:flex; align-items:center; gap:.75rem; margin-top:.35rem;">
-                <label style="min-width: 16rem;">${L("BLINDSKILLROLLS.Settings.NpcReplacement.Name","NPC placeholder name")}</label>
-                <input type="text" name="repl" value="${repl}" style="flex:1;">
+                <label style="min-width: 16rem;">${context.labels.npcReplName}</label>
+                <input type="text" name="repl" value="${context.repl}" style="flex:1;">
               </div>
-              <p class="hint">${L("BLINDSKILLROLLS.Settings.NpcReplacement.Hint","Placeholder shown to players instead of the real NPC name.")}</p>
+              <p class="hint">${context.labels.npcReplHint}</p>
             </fieldset>
 
             <p style="color: var(--color-text-dark-secondary); margin-top:.6rem;">
-              ${L("BLINDSKILLROLLS.Menu.Chat.Note","-")}
+              ${context.labels.note}
             </p>
+
+            <footer class="form-footer" style="display: flex; flex-direction: column; gap: 0; margin-top: 1rem;">
+              <button type="button" data-action="cancel" style="width: 100%; margin-bottom: 0; border-radius: 0;">
+                ${context.labels.cancel}
+              </button>
+              <button type="submit" data-action="save" style="width: 100%; margin-bottom: 0; border-radius: 0;">
+                ${context.labels.save}
+              </button>
+            </footer>
           </form>
         `;
 
-        new Dialog({
-          title: L("BSR.Menu.Chat.Name","Configure Chat Display"),
-          content,
-          buttons: {
-            cancel: { label: L("BSR.UI.Cancel","Cancel") },
-            save: {
-              label: L("BSR.UI.Save","Save"),
-              callback: async (html) => {
-                const root = html?.[0] ?? html;
-                const f = root.querySelector("form");
-                await game.settings.set(MOD, "hideForeignSecrets",      !!f.hide.checked);
-                await game.settings.set(MOD, "muteForeignSecretSounds", !!f.mute.checked);
-                await game.settings.set(MOD, "bsrSanitizePublicGm",     !!f.sanitize.checked);
-                await game.settings.set(MOD, "bsrTrustedSeeDetails",    !!f.trusted.checked);
-                await game.settings.set(MOD, "bsrNpcMaskDefault",       !!f.maskDef.checked);
-                await game.settings.set(MOD, "bsrNpcNameReplacement",    f.repl.value?.trim() || "Unknown");
-              }
-            }
-          },
-          default: "save"
-        }, {
-          width: 820,
-          height: "auto",
-          resizable: true,
-          classes: ["bsr-chat-dialog"]
-        }).render(true);
+        return content;
+      }
 
-        return this;
+      _replaceHTML(result, content, options) {
+        let windowContent = content.querySelector(".window-content");
+        if (!windowContent) {
+          content.innerHTML = result;
+        } else {
+          windowContent.innerHTML = result;
+        }
+      }
+
+      _onRender(context, options) {
+        super._onRender(context, options);
+
+        const theme = window.BSR?.getTheme?.() || "light";
+
+        const style = document.createElement('style');
+        style.textContent = window.BSR?.getThemeStyles?.(theme) || "";
+
+        if (this.element && !this.element.querySelector('style.bsr-theme-style')) {
+          style.classList.add('bsr-theme-style');
+          this.element.appendChild(style);
+        }
+
+        const form = this.element.querySelector("form");
+        if (form) {
+          form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            this.#onSave(event);
+          });
+        }
+      }
+
+      async #onSave(event) {
+        const formData = new foundry.applications.ux.FormDataExtended(event.target.form ?? event.target.closest("form")).object;
+
+        await game.settings.set(MOD, "hideForeignSecrets", !!formData.hide);
+        await game.settings.set(MOD, "muteForeignSecretSounds", !!formData.mute);
+        await game.settings.set(MOD, "bsrSanitizePublicGm", !!formData.sanitize);
+        await game.settings.set(MOD, "bsrTrustedSeeDetails", !!formData.trusted);
+        await game.settings.set(MOD, "bsrNpcMaskDefault", !!formData.maskDef);
+        await game.settings.set(MOD, "bsrNpcNameReplacement", String(formData.repl ?? "").trim());
+
+        this.close();
+      }
+
+      async _onSaveAction(event, target) {
+        const form = this.element.querySelector("form");
+        if (form) {
+          const formData = new foundry.applications.ux.FormDataExtended(form).object;
+
+          await game.settings.set(MOD, "hideForeignSecrets", !!formData.hide);
+          await game.settings.set(MOD, "muteForeignSecretSounds", !!formData.mute);
+          await game.settings.set(MOD, "bsrSanitizePublicGm", !!formData.sanitize);
+          await game.settings.set(MOD, "bsrTrustedSeeDetails", !!formData.trusted);
+          await game.settings.set(MOD, "bsrNpcMaskDefault", !!formData.maskDef);
+          await game.settings.set(MOD, "bsrNpcNameReplacement", String(formData.repl ?? "").trim());
+        }
+
+        this.close();
+      }
+
+      async _onCancelAction(event, target) {
+        this.close();
       }
     }
 
     game.settings.registerMenu(MOD, "menuChat", {
-      name:  L("BSR.Menu.Chat.Name","Configure Chat Display"),
-      label: L("BSR.Menu.Chat.Label","visibility of chat messages"),
+      name:  "BSR.Menu.Chat.Name",
+      label: "BSR.Menu.Chat.Label",
       icon:  "fa-solid fa-comments",
       type:  BSRMenuChatDisplay,
       restricted: true
     });
 
-    log("| chat + gm-rolls + npc settings registered (single menu)");
+    globalThis.dbgWarn?.("BSR| chat + gm-rolls + npc settings registered (single menu)");
   });
 
   function injectChatDisplayControls(_app, jqOrHtml) {
@@ -179,7 +272,7 @@
       const sanitize= !!game.settings.get(MOD, "bsrSanitizePublicGm");
       const trusted = !!game.settings.get(MOD, "bsrTrustedSeeDetails");
       const mask    = !!game.settings.get(MOD, "bsrNpcMaskDefault");
-      const repl    =  game.settings.get(MOD, "bsrNpcNameReplacement") ?? "Unknown";
+      const repl    =  game.settings.get(MOD, "bsrNpcNameReplacement") ?? "";
 
       const fs = document.createElement("fieldset");
       fs.className = "form-group bsr-chatdisplay";
@@ -248,11 +341,11 @@
           game.settings.set(MOD, "bsrNpcMaskDefault", ev.currentTarget.checked)
         );
         fs.querySelector('input[name="bsrNpcNameReplacement"]')?.addEventListener("change", ev =>
-          game.settings.set(MOD, "bsrNpcNameReplacement", ev.currentTarget.value?.trim() || "Unknown")
+          game.settings.set(MOD, "bsrNpcNameReplacement", String(ev.currentTarget.value ?? "").trim())
         );
       }
     } catch (e) {
-      warn("| inject Chat Display controls failed", e);
+      globalThis.dbgWarn?.("BSR| inject Chat Display controls failed", e);
     }
   }
 
@@ -261,3 +354,5 @@
   Hooks.on("renderChatConfig", injectChatDisplayControls);
 
 })();
+window.BSR_102.load_count += 1;
+BSR_102.load_complete();

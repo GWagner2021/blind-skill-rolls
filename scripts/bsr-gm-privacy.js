@@ -1,4 +1,5 @@
-// scripts/gm-roll-privacy.js
+// scripts/bsr-gm-privacy.js
+
 (() => {
   "use strict";
 
@@ -7,7 +8,7 @@
   const GET = (k, fb=false) => { try { return game.settings.get(MOD, k); } catch { return fb; } };
   const STRIP_GM_PUBLIC      = () => GET("bsrSanitizePublicGm", true);
   const TRUSTED_SEES_DETAILS = () => GET("bsrTrustedSeeDetails", false);
-  
+
   const isTrusted = () => (game.user?.role ?? 0) >= CONST.USER_ROLES.TRUSTED;
   const isGMUser  = (u) => !!u && (u.isGM || u.role >= CONST.USER_ROLES.ASSISTANT);
 
@@ -21,6 +22,9 @@
       ".inline-roll .collapse-toggle"
     ].join(",")).forEach(n => n.remove());
   }
+  Hooks.on("ready", () => {
+    window.BSR_102.load_count += 1;
+  });
 
   Hooks.on("renderChatMessageHTML", (message, html) => {
     try {
@@ -40,6 +44,8 @@
 
       const content = el.querySelector(".message-content") ?? el;
       stripFormulasAndTooltips(content);
-    } catch (e) { console.warn("[BSR] sanitize public GM roll", e); }
+    } catch (e) { globalThis.dbgWarn?.("[BSR] sanitize public GM roll", e); }
   });
 })();
+window.BSR_102.load_count += 1;
+BSR_102.load_complete();

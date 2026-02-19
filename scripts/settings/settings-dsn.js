@@ -1,4 +1,5 @@
 // scripts/settings-dsn.js
+
 (() => {
   const MOD = "blind-skill-rolls";
   const DSN_MOD = "dice-so-nice";
@@ -55,9 +56,10 @@
         default: "2",
         onChange: (v) => { if (game.user?.isGM) BSR.setDsnGhost(String(v)).catch(console.warn); }
       });
-      console.log("BSR | DSN proxy setting registered.");
+      globalThis.dbgWarn?.("BSR | DSN proxy setting registered.");
+      window.BSR_102.load_count += 1;
     } catch (e) {
-      console.error("BSR | Registering DSN proxy setting failed:", e);
+      console.error(game.i18n.localize("BLINDSKILLROLLS.Log.FailedDSNProxyRegistration"), e);
     }
   });
 
@@ -79,7 +81,9 @@
       if (!game.modules.get(DSN_MOD)?.active) return;
       await BSR.setDsnGhost(v, { silent: true });
     } catch (e) {
-      console.warn("BSR | ready sync failed:", e);
+      console.warn(game.i18n.localize("BLINDSKILLROLLS.Log.BSRReadySyncFailed"), e);
     }
   });
 })();
+window.BSR_102.load_count += 1;
+BSR_102.load_complete();

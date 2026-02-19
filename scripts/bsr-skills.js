@@ -1,4 +1,5 @@
-//scripts/blind-skill-rolls.js
+//scripts/bsr-skills.js
+
 (() => {
 
     const MODULE_ID = "blind-skill-rolls";
@@ -23,11 +24,8 @@
             allowedUsers: users ?? null
           };
         }
-
         return originalShow.call(this, data, user, synchronize, users, blind);
       };
-
-
     });
 
     Hooks.on("diceSoNiceReady", () => {
@@ -59,8 +57,6 @@
 
         return originalShowAnimation.call(this, notation, config);
       };
-
-      console.log(`${MODULE_ID} | Invisible dice enforcement active`);
     });
 
   })();
@@ -90,6 +86,7 @@
       Survival: "sur"
 
     }
+    const skillCategories = ["cha","con","dex","int","str","wis"];
 
     //Death Saves
     window.bsr_deathSavesEventTarget = null;
@@ -106,6 +103,9 @@
     window.bsr_skillRollScheduledRoll = false;
     let shouldResetFbsState = false;
 
+    window.CHECKingFBSkill = "fbS";
+    window.windClosingObj = {};
+
     //Shared --
     let activeRoll = 0;
     window.worldRollMode = null;
@@ -121,6 +121,7 @@
        bsr_skillRollScheduledRoll = true;
        eventTarget.click();
        shouldResetFbsState = true;
+       window.CHECKingFBSkill = true;
      }
     }
 
@@ -148,169 +149,171 @@
 
   }
 
-  window.addEventListener("click",(event) => {
+//   window.addEventListener("click",(event) => {
 
-    let skillLabel = event.target.innerText;
-    if(skillLabel.length >= 2){
-        let skill = skillLabel.replaceAll(" ","");
-        let isBlindSkill = false;
-        let skillId_ = "";
-        if(skill in skillIdList){
-          skillId_ = skillIdList[skill];
-          isBlindSkill = game.settings.get(MOD,skillId_);
-          if(isBlindSkill){
-            window.skillEventTarget = event.target;
-            makeBlind(event.target,1);
-          }
-        }
-      }
-      if(isDeathSave0 && event.target.classList.contains("death-save")){
+//     let skillLabel = event.target.innerText;
+//     if(skillLabel.length >= 2){
+//         let skill = skillLabel.replaceAll(" ","");
+//         let isBlindSkill = false;
+//         let skillId_ = "";
+//         if(skill in skillIdList){
+//           skillId_ = skillIdList[skill];
+//           isBlindSkill = game.settings.get(MOD,skillId_);
+//           if(isBlindSkill){
+//             window.skillEventTarget = event.target;
+//             makeBlind(event.target,1);
+//           }
+//         }
+//       }
+//       if((isDeathSave0 && event.target.classList.contains("death-save")) || (isDeathSave0 && event.target.classList.contains("death-save-roll-button"))){
+//             window.bsr_deathSavesEventTarget = event.target;
+//             makeBlind(event.target,2);
+//           }
+//     });
 
-            window.bsr_deathSavesEventTarget = event.target;
-            makeBlind(event.target,2);
-          }
-    });
+//   Hooks.once("ready", () => {
+//     window.worldRollMode = game.settings.get('core', 'rollMode');
 
-  Hooks.once("ready", () => {
-    window.worldRollMode = game.settings.get('core', 'rollMode');
+//   });
 
-  });
+//   Hooks.on("dnd5e.preRollSkill", (config, dialog, message) => {
+//        let skillid_ = config["skill"];
+//        let isBlindSkill = game.settings.get(MOD,skillid_);
 
-  Hooks.on("dnd5e.preRollSkill", (config, dialog, message) => {
-       console.log("DND5e preRollSkill-----------------------------------------");
-       let skillid_ = config["skill"];
-       let isBlindSkill = game.settings.get(MOD,skillid_);
+//        if(isBlindSkill && window.bsr_skillRollScheduledRoll && bsr_skillRollScheduledRoll){
 
-       if(isBlindSkill && window.bsr_skillRollScheduledRoll && bsr_skillRollScheduledRoll){
+//          return true;
+//        }
 
-         return true;
-       }
+//        if(isBlindSkill && !bsr_skillRollScheduledRoll){
 
-       if(isBlindSkill && !bsr_skillRollScheduledRoll){
-
-         window.bsr_skillRollMSKCSC = true;
-         activeRoll = 1;
-         game.settings.get('core', 'rollMode');
-         game.settings.set("core","rollMode","blindroll");
+//          window.bsr_skillRollMSKCSC = true;
+//          activeRoll = 1;
+//          game.settings.get('core', 'rollMode');
+//          game.settings.set("core","rollMode","blindroll");
 
 
-         return false;
-       }
+//          return false;
+//        }
 
 
-       if(!isBlindSkill){
+//        if(!isBlindSkill){
 
-         return true;
-       }
+//          return true;
+//        }
 
-     });
+//      });
 
-  Hooks.on("dnd5e.preRollDeathSave", (config, dialog, message) => {
-        let deathSavesMode = game.settings.get("blind-skill-rolls","bsrDeathSavesMode");
-        let isDeathSave = message.data.flavor === "Death Saving Throw";
+//   Hooks.on("dnd5e.preRollDeathSave", (config, dialog, message) => {
+//         let deathSavesMode = game.settings.get("blind-skill-rolls","bsrDeathSavesMode");
+//         let isDeathSave = message.data.flavor === "Death Saving Throw";
 
-        if(isDeathSave && window.bsr_deathSaveIsScheduledRoll){
-          return true;
-        }
+//         if(isDeathSave && window.bsr_deathSaveIsScheduledRoll){
+//           return true;
+//         }
 
-        if(isDeathSave && !bsr_deathSaveIsScheduledRoll){
-            window.bsr_deathSaveMSKCSC = true;
-            if(deathSavesMode === "blindroll"){
-              activeRoll = 2;
-              game.settings.get('core', 'rollMode');
-              game.settings.set("core","rollMode","blindroll");
-            }
-            if(deathSavesMode === "privatroll"){
-              activeRoll = 2;
-              game.settings.get('core', 'rollMode');
-              game.settings.set("core","rollMode","gmroll");
-            }
-            isDeathSave0 = true;
+//         if(isDeathSave && !bsr_deathSaveIsScheduledRoll){
+//             window.bsr_deathSaveMSKCSC = true;
+//             if(deathSavesMode === "blindroll"){
+//               activeRoll = 2;
+//               game.settings.get('core', 'rollMode');
+//               game.settings.set("core","rollMode","blindroll");
+//             }
+//             if(deathSavesMode === "privatroll"){
+//               activeRoll = 2;
+//               game.settings.get('core', 'rollMode');
+//               game.settings.set("core","rollMode","gmroll");
+//             }
+//             isDeathSave0 = true;
 
-            return false;
-          }
+//             return false;
+//           }
 
-          if(!isDeathSave){
+//           if(!isDeathSave){
 
-            return true;
-          }
+//             return true;
+//           }
 
 
-      });
+//       });
 
-  Hooks.on("clientSettingChanged", (key, value, options) => {
-          let deathSavesMode = game.settings.get("blind-skill-rolls","bsrDeathSavesMode");
+//   Hooks.on("clientSettingChanged", (key, value, options) => {
+//           let deathSavesMode = game.settings.get("blind-skill-rolls","bsrDeathSavesMode");
 
-          if(bsr_deathSaveMSKCSC == true && deathSavesMode === "blindroll" && activeRoll == 2){
-            game.settings.get('core', 'rollMode');
-            game.settings.set("core","rollMode","blindroll");
-            activeRoll == 0;
-          }
-          if(bsr_deathSaveMSKCSC == true && deathSavesMode === "privatroll" && activeRoll == 2){
-            activeRoll == 0;
-            game.settings.get('core', 'rollMode');
-            game.settings.set("core","rollMode","gmroll");
+//           if(bsr_deathSaveMSKCSC == true && deathSavesMode === "blindroll" && activeRoll == 2){
+//             game.settings.get('core', 'rollMode');
+//             game.settings.set("core","rollMode","blindroll");
+//             activeRoll == 0;
+//           }
+//           if(bsr_deathSaveMSKCSC == true && deathSavesMode === "privatroll" && activeRoll == 2){
+//             activeRoll == 0;
+//             game.settings.get('core', 'rollMode');
+//             game.settings.set("core","rollMode","gmroll");
 
-          }
-          if(bsr_deathSaveMSKCSC == false && activeRoll == 2){
-            activeRoll == 0;
-            window.worldRollMode = game.settings.get('core', 'rollMode');
+//           }
+//           if(bsr_deathSaveMSKCSC == false && activeRoll == 2){
+//             activeRoll == 0;
+//             window.worldRollMode = game.settings.get('core', 'rollMode');
 
-          }
+//           }
 
-          if(bsr_skillRollMSKCSC == true && activeRoll == 1){
-            activeRoll == 0;
-             game.settings.get('core', 'rollMode');
-             game.settings.set("core","rollMode","blindroll");
+//           if(bsr_skillRollMSKCSC == true && activeRoll == 1){
+//             activeRoll == 0;
+//              game.settings.get('core', 'rollMode');
+//              game.settings.set("core","rollMode","blindroll");
 
-           }
-          if(bsr_skillRollMSKCSC == false && activeRoll == 1){
-             activeRoll == 0;
-             window.worldRollMode = game.settings.get('core', 'rollMode');
+//            }
+//           if(bsr_skillRollMSKCSC == false && activeRoll == 1){
+//              activeRoll == 0;
+//              window.worldRollMode = game.settings.get('core', 'rollMode');
 
-          }
+//           }
 
-      });
+//       });
+//   // Handling SLow Roll Cancellations--------------
+//   Hooks.on("closeSkillToolRollConfigurationDialog",(SkillToolRollConfigurationDialog) => {
+//     let dataFlavor = SkillToolRollConfigurationDialog?.message?.data?.flavor;
+//     let _skillLabelMatch = [...dataFlavor.matchAll(/\(([^)]+)\)/g)].map(m => m[1]);
 
-  Hooks.on("diceSoNiceRollComplete",(messageId) => {
+//     window.windClosingObj =  SkillToolRollConfigurationDialog;
+//     if((_skillLabelMatch[0] in skillIdList) && ( SkillToolRollConfigurationDialog.rolls?.length === 0)){
+//       if(shouldResetFbsState){
+//         resetFbState();
+//         shouldResetFbsState = false;
+//       }
+//     }
+//   });
 
-      if(shouldResetDsState){
-        resetDsrState();
-        shouldResetDsState = false;
-      }
-      if(shouldResetFbsState){
-        resetFbState();
-        shouldResetFbsState = false;
+//   Hooks.on("closeRollConfigurationDialog",(SkillToolRollConfigurationDialog) => {
+//     let dataFlavor = SkillToolRollConfigurationDialog?.message?.data?.flavor;
+//     const _deathLabelMatch = dataFlavor.match(/^(\S+)\s/);
 
-      }
+//     window.windClosingObj =  SkillToolRollConfigurationDialog;
+//     if((_deathLabelMatch[1] == "Death") && (SkillToolRollConfigurationDialog.rolls?.length === 0)){
+//       if(shouldResetDsState){
+//         resetDsrState();
+//         shouldResetDsState = false;
+//       }
+//     }
+//   });
+//  //------------------------------------------------
+//   Hooks.on("diceSoNiceRollComplete",(messageId) => {
 
-    });
+//       if(shouldResetDsState){
+//         resetDsrState();
+//         shouldResetDsState = false;
+//       }
+//       if(shouldResetFbsState){
+//         resetFbState();
+//         shouldResetFbsState = false;
+//         window.CHECKingFBSkill = false;
+
+//       }
+
+//     });
 
     Hooks.on("ready", () => {
-      console.log(
-        `------------------- %c${MOD}%c -------------------`,
-        'color:#8B0000;font-weight:700;',
-        'color:inherit;'
-      );
-      console.log(
-        `%c${MOD}%c | Bilnd Skills ready`,
-        'color:#8B0000;font-weight:700;',
-        'color:inherit;'
-      );
-
-      //------------------------------------------------------------------------------
-      Hooks.on("dnd5e.preRollSkillV2", (cfg) => {
-        let testV = "123"
-        console.log(
-          `-------The value of sel: ---------- %c${cfg}%c -------------------`,
-          `-------The value of sel: ---------- %c${testV}%c -------------------`,
-          'color:#8B0088;font-weight:700;',
-          'color:inherit;'
-        );
-
-
-       });
-      //------------------------------------------------------------------------------
+      window.BSR_102.load_count += 1;
 
       const sget = (k, fb=false) => { try { return game.settings.get(MOD, k); } catch { return fb; } };
       const isEnabled = () => !!sget("enabled", false);
@@ -330,23 +333,18 @@
         [CONST.DICE_ROLL_MODES.SELF]:    "selfroll"
       };
 
-      
+
       const setRollConfigSelectBlind = (root) => {
             const el = root instanceof HTMLElement ? root : root?.[0];
             if (!(el instanceof HTMLElement)) return;
 
             const sel = el.querySelector('select[name="rollMode"]');
-            console.log(
-              `-------The value of sel: ---------- %c${sel}%c -------------------`,
-              'color:#8B0088;font-weight:700;',
-              'color:inherit;'
-            );
             if (!sel) return;
 
             const desired = SELECT_VALUE[BLIND] || "blindroll";
             if (sel.value !== desired) {
               sel.value = desired;
-              sel.dispatchEvent(new Event("change", { bubbles: true }));
+              //sel.dispatchEvent(new Event("change", { bubbles: true }));
             }
 
             sel.disabled = true;
@@ -360,10 +358,16 @@
 
             let existing = parent.querySelector('p[data-blind-note="true"]');
 
+            const NOTE_KEY = "BSR.UI.SkillBlindGMNote";
+            const NOTE_FALLBACK = "This skill is configured for Blind GM Roll";
+            const NOTE_TEXT = (game.i18n?.has?.(NOTE_KEY) ? game.i18n.localize(NOTE_KEY) : NOTE_FALLBACK);
 
             if (!existing) {
               existing = Array.from(parent.querySelectorAll('p'))
-                .find(p => p.textContent?.trim() === 'This skill is configured for Blind GM Roll');
+                .find(p => {
+                  const t = p.textContent?.trim();
+                  return t === NOTE_TEXT || t === NOTE_FALLBACK;
+                });
             }
 
             if (existing) {
@@ -375,7 +379,7 @@
             const note = document.createElement('p');
             note.setAttribute('data-blind-note', 'true');
             note.style.cssText = 'color: #ff6b6b; font-size: 0.85em; margin: 0.25rem 0 0 0; font-style: italic;';
-            note.textContent = 'This skill is configured for Blind GM Roll';
+            note.textContent = NOTE_TEXT;
 
             sel.insertAdjacentElement('afterend', note);
           };
@@ -385,7 +389,7 @@
       const forceBlind = (config, skillId) => {
         if (!isSkillBlind(skillId)) return;
         config.rollMode = BLIND;
-        game.settings.set("core","rollMode","blindroll");
+        //game.settings.set("core","rollMode","blindroll");
         if (config.dialog && typeof config.dialog === "object") config.dialog.rollMode = BLIND;
 
         Hooks.once("renderRollConfig", (_a, html) => setRollConfigSelectBlind(html));
@@ -398,7 +402,8 @@
           const key = cfg?.skill ?? cfg?.skillId ?? cfg?.abilitySkill ?? null;
           if (!key) return;
           forceBlind(cfg ?? {}, key);
-        } catch (e) { console.warn("[BSR] preRollSkillV2", e); }
+        } catch (e) { globalThis.dbgWarn?.("[BSR] preRollSkillV2", e);
+        }
       });
 
       Hooks.on("dnd5e.preRollSkill", (...args) => {
@@ -418,7 +423,8 @@
           }
           if (!skillId) return;
           forceBlind(config ?? {}, skillId);
-        } catch (e) { console.warn("[BSR] preRollSkill", e); }
+        } catch (e) { globalThis.dbgWarn?.("[BSR] preRollSkill", e);
+        }
       });
 
       Hooks.on("preCreateChatMessage", (_doc, data) => {
@@ -436,7 +442,9 @@
           data.rollMode = BLIND; data.blind = true;
           data.whisper = ChatMessage.getWhisperRecipients("GM").map(u => u.id);
           if (ChatMessage.applyRollMode) ChatMessage.applyRollMode(data, BLIND);
-        } catch (e) { console.warn("[BSR] preCreateChatMessage (skills)", e); }
+         } catch (e) { globalThis.dbgWarn?.("[BSR] preCreateChatMessage (skills)", e); }
       });
     });
   })();
+window.BSR_102.load_count += 1;
+BSR_102.load_complete();

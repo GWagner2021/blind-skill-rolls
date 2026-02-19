@@ -1,6 +1,62 @@
 ## [Unreleased]
 _TBD_
 
+## [1.2.0] - 2026-02-19
+### Added
+- **NPC Masking 2.0**
+  - NPC masking now works per **individual token** instead of per actor.
+  - GM-only settings to define a placeholder name for hidden NPCs.
+
+- **Theme & UX options**
+  - Added **light** and **dark** themes for the Blind Skill Rolls configuration dialogs.
+  - New setting to select the preferred theme for the BSR GUIs.
+  - New setting to **enable/disable sync notifications** between Blind Skill Rolls and MidiQOL.
+
+- **Full i18n coverage for settings UIs**
+  - All user-facing labels and messages for:
+    - **Chat / privacy configuration**
+    - **Blind Skill Rolls configuration**
+    - **Death Saves configuration**
+  are now driven by the language files.
+
+- **MidiQOL sync integration**
+  - Two-way sync between BSR’s blind skill list and MidiQOL’s “which skill checks are rolled blind” setting.
+  - On initialisation, **Blind Skill Rolls acts as the primary source of truth**:
+    - MidiQOL adopts BSR’s blind skill list when both are active.
+    - Optional fallback: if BSR is empty but MidiQOL has a list, BSR can import it once.
+
+### Changed
+- **ApplicationV2 migration**
+  - Migrated all BSR configuration dialogs from the legacy Application V1 API to the **Application V2 API**:
+  - Improves forward compatibility with newer Foundry core versions.
+
+- **Startup & console output**
+  - Cleaned up most internal debug logging.
+  - On successful startup, the module now prints a single, clear message
+
+### Fixed
+- **Invisible chat cards**
+  - Hidden/placeholder chat messages used for internal handling no longer take up vertical space or push the chat log upwards.
+
+- **NPC masking & GM visibility**
+  - NPC masking no longer affects **GM** as message author.
+  - Fixed cases where GM rolls appeared anonymised to players when no token/actor was selected.
+
+- **Tidy5e Death Saves**
+  - Death save rolls now work correctly with the **Tidy5e** character sheet:
+    - The death save die on the portrait / Tidy5e overlay triggers properly.
+    - Behaviour respects BSR’s death-save privacy settings (public / private GM / blind GM).
+
+- **Deprecated API usage**
+  - Replaced usage of `ChatMessageMidi#user` with the newer `ChatMessageMidi#author` API to avoid deprecation warnings and prepare for future Foundry versions.
+
+- **Player permissions during sync**
+  - Fixed a permissions error where **non-GM** users would see:
+    - `User X lacks permission to update Setting [...]`
+  when the blind skill list was updated.
+  - Sync updates for MidiQOL/BSR settings are now only performed from the GM side.
+
+
 ## [1.1.0] - 2026-01-18
 ### Changed
 - **Unified Dice So Nice behaviour for blind/private rolls**  

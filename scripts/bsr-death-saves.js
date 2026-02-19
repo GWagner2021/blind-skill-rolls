@@ -1,4 +1,4 @@
-// scripts/blind-death-saves.js
+// scripts/bsr-death-saves.js
 
 (() => {
   "use strict";
@@ -12,6 +12,9 @@
     const t  = d5?.roll?.type ?? d5?.type ?? d5?.rollType ?? "";
     return t === "death";
   };
+  Hooks.on("ready", () => {
+    window.BSR_102.load_count += 1;
+  });
   Hooks.on("dnd5e.rollDeathSaveV2", (_rolls, details) => {
     if (details && typeof details === "object") details.chatString = undefined;
   });
@@ -57,3 +60,5 @@
     }
   });
 })();
+window.BSR_102.load_count += 1;
+BSR_102.load_complete();

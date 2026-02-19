@@ -1,4 +1,99 @@
 // scripts/bsr-chat-hide.js
+
+(function() {
+    'use strict';
+
+    //====================================================================================
+    //The section prevents Invisible chat cards from pushing up the chat log
+    //====================================================================================
+
+    Hooks.once('ready', () => {
+        const isGM = game.user.isGM;
+
+        // Inject CSS
+        const style = document.createElement('style');
+
+        if (isGM) {
+            style.textContent = `
+                .chat-message.hidden_msg {
+                    border: 2px solid rgba(255, 0, 0, 0.3) !important;
+                    position: relative !important;
+                }
+
+                .chat-message.hidden_msg::before {
+                    content: "🔒 Hidden from players";
+                    position: absolute;
+                    top: -2px;
+                    left: -2px;
+                    background: rgba(255, 0, 0, 0.8);
+                    color: white;
+                    padding: 2px 6px;
+                    font-size: 10px;
+                    font-weight: bold;
+                    border-radius: 3px;
+                    z-index: 10;
+                }
+            `;
+        } else {
+            style.textContent = `
+                .chat-message.hidden_msg {
+                    display: none !important;
+                }
+            `;
+        }
+
+        document.head.appendChild(style);
+
+        if (!isGM) {
+            Hooks.on('renderChatMessageHTML', (message, html) => {
+                if (html && html.classList && html.classList.contains('hidden_msg')) {
+                    html.style.setProperty('display', 'none', 'important');
+                    html.style.setProperty('height', '0', 'important');
+                    html.style.setProperty('margin', '0', 'important');
+                    html.style.setProperty('padding', '0', 'important');
+                    html.style.setProperty('border', '0', 'important');
+                }
+            });
+
+            setTimeout(() => {
+                const chatLog = document.querySelector('#chat-log');
+                if (!chatLog) {
+                    globalThis.dbgWarn?.("Chat Message Hider: Chat log not found");
+                    return;
+                }
+
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        mutation.addedNodes.forEach((node) => {
+                            if (node.nodeType === 1 && node.classList?.contains('chat-message')) {
+                                if (node.classList.contains('hidden_msg')) {
+                                    node.style.setProperty('display', 'none', 'important');
+                                    node.style.setProperty('height', '0', 'important');
+                                    node.style.setProperty('margin', '0', 'important');
+                                    node.style.setProperty('padding', '0', 'important');
+                                    node.style.setProperty('border', '0', 'important');
+                                }
+                            }
+                        });
+                    });
+                });
+
+                observer.observe(chatLog, {
+                    childList: true,
+                    subtree: false
+                });
+
+                chatLog.querySelectorAll('.chat-message.hidden_msg').forEach((element) => {
+                    element.style.setProperty('display', 'none', 'important');
+                    element.style.setProperty('height', '0', 'important');
+                    element.style.setProperty('margin', '0', 'important');
+                    element.style.setProperty('padding', '0', 'important');
+                    element.style.setProperty('border', '0', 'important');
+                });
+            }, 500);
+        }
+    });
+})();
 (() => {
   "use strict";
   const MOD = "blind-skill-rolls";
@@ -30,7 +125,8 @@
   function isAddressedToMe(m){
     const me = meId(); if (!me) return false;
     if (!isSecret(m)) return true;
-    const author = m?.author?.id ?? m?.user ?? m?.userId;
+    // v13+ compatible: author.id → author → user (deprecated) → userId (legacy)
+    const author = m?.author?.id ?? m?.author ?? m?.user ?? m?.userId;
     if (String(author)===String(me)) return true;
     return whisperIds(m).map(String).includes(String(me));
   }
@@ -140,7 +236,7 @@
 
   Hooks.on("renderChatMessageHTML", (msg, el) => {
     try { if (!el) return; shouldHideForMe(msg) ? el.removeAttribute("data-bsr-visible") : el.setAttribute("data-bsr-visible","1"); }
-    catch(e){ warn("renderChatMessageHTML mark failed", e); }
+    catch(e){ warn(game.i18n.localize("BLINDSKILLROLLS.Log.RCMHTMLMarkFailed"), e); }
   });
   Hooks.on("createChatMessage", ()=>{ try { sweepAllRoots(); setTimeout(sweepAllRoots,0); } catch {} });
 
@@ -221,7 +317,7 @@
         };
         PATCHED.audio=true;
       }
-    } catch(e){ warn("AudioHelper patch failed", e); }
+    } catch(e){ warn(game.i18n.localize("BLINDSKILLROLLS.Log.AudioPatchFailed"), e); }
   }
   function patchFoundrySoundClass(){
     if (PATCHED.sound) return;
@@ -239,7 +335,7 @@
       };
       foundry.audio.Sound.prototype.play._bsrPatched=true;
       PATCHED.sound=true;
-    } catch(e){ warn("Sound.prototype.play patch failed", e); }
+    } catch(e){ warn(game.i18n.localize("BLINDSKILLROLLS.Log.SPPPatchFailed"), e); }
   }
   function patchHowlerPlay(){
     if (PATCHED.howl) return;
@@ -258,7 +354,7 @@
         Howl.prototype.play._bsrPatched=true;
         PATCHED.howl=true;
       }
-    } catch(e){ warn("Howler patch failed", e); }
+    } catch(e){ warn(game.i18n.localize("BLINDSKILLROLLS.Log.HowlerPatchFailed"), e); }
   }
   function patchHTMLAudioPlay(){
     if (PATCHED.html) return;
@@ -276,7 +372,7 @@
       };
       P.play._bsrPatched=true;
       PATCHED.html=true;
-    } catch(e){ warn("HTMLAudio patch failed", e); }
+    } catch(e){ warn(game.i18n.localize("BLINDSKILLROLLS.Log.HTMLAPatchFailed"), e); }
   }
   function installAudioPatches(){
     patchAudioHelperPlay();
@@ -292,7 +388,7 @@
       const secret=!!data?.blind || (Array.isArray(data?.whisper) && data.whisper.length>0);
       if (!secret) return;
       const me=meId();
-      const author=String(data?.user ?? data?.userId ?? "");
+      const author=String(data?.author?.id ?? data?.author ?? data?.user ?? data?.userId ?? "");
       const wh = Array.isArray(data?.whisper) ? data.whisper.map(String) : [];
       const toMe = (author===String(me)) || wh.includes(String(me));
       if (!toMe) openMute(3500);
@@ -321,10 +417,14 @@
 
     sweepAllRoots(); setTimeout(sweepAllRoots, 0); setTimeout(()=>sweepAllRoots(), 80);
 
-    log(LF("BLINDSKILLROLLS.Log.ReadyText",
-      { hide: String(OPT_HIDE()), mute: String(OPT_MUTE()) },
-      `ready | hide=${OPT_HIDE()} | mute=${OPT_MUTE()}`
-    ));
+    if (globalThis.BSR_DEBUG === true) {
+      log(LF("BLINDSKILLROLLS.Log.ReadyText",
+        { hide: String(OPT_HIDE()), mute: String(OPT_MUTE()) },
+        `ready | hide=${OPT_HIDE()} | mute=${OPT_MUTE()}`
+      ));
+    }
+
+    window.BSR_102.load_count += 1;
   });
 
   Hooks.on("renderChatLog", () => { applyCssGuard(); observeSidebar(); setTimeout(sweepAllRoots, 0); });
@@ -337,7 +437,7 @@
     }
 
     Hooks.on("renderChatMessageHTML", (message, html, data) => {
-        
+
         if(!game.user.isGM){
           if(message.blind  && game.settings.get(MOD, "blindRollersChat") && message.flavor != "Death Saving Throw")  {html.classList.add("hidden_msg");}
           if(message.blind  && game.settings.get(MOD, "blindRollersDeathSaveChat") && message.flavor == "Death Saving Throw") {html.classList.add("hidden_msg");}
@@ -349,3 +449,5 @@
       removeBlind();
     });
 })();
+window.BSR_102.load_count += 1;
+BSR_102.load_complete();

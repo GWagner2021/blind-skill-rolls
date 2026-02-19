@@ -1,7 +1,14 @@
 {
   "BLINDSKILLROLLS.NPC.Unknown": "Неизвестно",
+  "BLINDSKILLROLLS.NPC.ToggleNameVisibility": "Переключить видимость имени",
+  "BLINDSKILLROLLS.NPC.HideName": "Скрыть имя",
+  "BLINDSKILLROLLS.NPC.RevealName": "Раскрыть имя",
 
   "BLINDSKILLROLLS.Settings.Enabled.Name": "Включить Blind Skill Rolls",
+  "BSR.Settings.Theme.Name": "Тема диалогов",
+  "BSR.Settings.Theme.Hint": "Выберите светлую или тёмную тему для диалогов модуля.",
+  "BSR.Settings.Theme.Light": "Светлая тема",
+  "BSR.Settings.Theme.Dark": "Тёмная тема",
 
   "BSR.SettingsGroup.Skills.Legend": "Blind Skill Rolls",
   "BSR.SettingsGroup.Skills.Hint": "Выберите, какие навыки должны принудительно бросаться как «Слепой бросок Мастеру».",
@@ -11,8 +18,12 @@
   "BSR.UI.Defaults": "По умолчанию",
   "BSR.Menu.Skills.Name": "Настроить Blind Skill Rolls",
   "BSR.Menu.Skills.Label": "Включить/Отключить отдельные навыки",
+  "BSR.SettingsGroup.RChats.Legend": "Скрывать сообщения Blind Skill Rolls в чате от автора броска",
+  "BSR.Settings.BlindRollersChat.Name": "Скрывать собственные слепые сообщения в чате",
+  "BSR.Settings.BlindRollersChat.Hint": "Скрывать от игрока его собственные слепые сообщения в чате.",
   "BSR.UI.Cancel": "Отмена",
   "BSR.UI.Save": "Сохранить",
+  "BSR.UI.SkillBlindGMNote": "Этот навык настроен на «Слепой бросок Мастеру».",
 
   "BSR.Settings.DSNGhostDice.Name": "Dice So Nice: режим призрачных костей",
   "BSR.Settings.DSNGhostDice.Hint": "Оставлять призрачные кости видимыми только автору броска (рекомендуется) или отключить их глобально.",
@@ -45,8 +56,30 @@
   "BLINDSKILLROLLS.Settings.DeathSaves.Mode.public": "Публично (все видят бросок)",
   "BLINDSKILLROLLS.Settings.DeathSaves.Mode.privatroll": "Приватный бросок Мастеру (автор + Мастер)",
   "BLINDSKILLROLLS.Settings.DeathSaves.Mode.blindroll": "Слепой бросок Мастера (только Мастер)",
+  "BLINDSKILLROLLS.Section.DeathSavesHiddenChats": "Скрывать сообщения спасбросков от смерти в чате от автора броска",
+  "BLINDSKILLROLLS.Settings.DeathSaves.BlindRollersDeathSaveChat.Name": "Скрывать собственные слепые сообщения спасбросков от смерти в чате",
+  "BLINDSKILLROLLS.Settings.DeathSaves.BlindRollersDeathSaveChat.Hint": "Скрывать от игрока его собственные слепые сообщения спасбросков от смерти в чате.",
   "BSR.Menu.DeathSaves.Name": "Настроить спасброски от смерти",
   "BSR.Menu.DeathSaves.Label": "видимость спасбросков от смерти",
 
-  "BLINDSKILLROLLS.Log.ReadyText": "готово | hide={hide} | mute={mute}"
+  "BLINDSKILLROLLS.Log.ReadyText": "готово | hide={hide} | mute={mute}",
+  "BLINDSKILLROLLS.Log.FailedDSNProxyRegistration": "BSR | Регистрация настройки прокси DSN не удалась:",
+  "BLINDSKILLROLLS.Log.BSRReadySyncFailed": "BSR | синхронизация ready не удалась:",
+
+  "BLINDSKILLROLLS.Log.RCMHTMLMarkFailed": "renderChatMessageHTML: отметка не удалась",
+  "BLINDSKILLROLLS.Log.AudioPatchFailed": "patch AudioHelper не удался",
+  "BLINDSKILLROLLS.Log.SPPPatchFailed": "patch Sound.prototype.play не удался",
+  "BLINDSKILLROLLS.Log.HowlerPatchFailed": "patch Howler не удался",
+  "BLINDSKILLROLLS.Log.HTMLAPatchFailed": "patch HTMLAudio не удался",
+
+  "BLINDSKILLROLLS.Log.NPCRLRCMHFailed": "[BSR] npc-reveal-live renderChatMessageHTML не удался",
+  "BLINDSKILLROLLS.Log.FLVFileFailedLoad": "Не удалось загрузить файл:",
+  "BLINDSKILLROLLS.Log.FLVReason": "Причина:",
+
+  "BLINDSKILLROLLS.UINotification.BSRMIDIInitSync": "Слепые навыки синхронизированы при запуске",
+  "BLINDSKILLROLLS.UINotification.Synced": "Синхронизировано ",
+  "BLINDSKILLROLLS.UINotification.BSRToMIDIQ": "слепые навыки в midi-qol",
+  "BLINDSKILLROLLS.UINotification.BSRFromMIDIQ": "слепые навыки из midi-qol",
+  "BSR.Settings.MidiSync.ShowSyncMessages.Name": "Показывать уведомления о синхронизации",
+  "BSR.Settings.MidiSync.ShowSyncMessages.Hint": "Показывать уведомления и сообщения в консоли при синхронизации слепых навыков с midi-qol. (Только Мастер)"
 }

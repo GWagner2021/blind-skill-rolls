@@ -1,7 +1,7 @@
 {
   "id": "blind-skill-rolls",
   "title": "Blind Skill Rolls",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "<p>Automatically sets selected DnD5e skill checks to Blind GM Roll. </p><p>Setzt ausgewählte DnD5e-Skillwürfe automatisch als Blind GM Roll.</p>",
   "compatibility": {
     "minimum": "13",
@@ -57,5 +57,5 @@
   "license": "https://github.com/GWagner2021/blind-skill-rolls/blob/main/LICENSE",
   "changelog": "https://github.com/GWagner2021/blind-skill-rolls/blob/main/CHANGELOG.md",
   "manifest": "https://github.com/GWagner2021/blind-skill-rolls/releases/latest/download/module.json",
-  "download": "https://github.com/GWagner2021/blind-skill-rolls/releases/download/v1.1.0/blind-skill-rolls.zip"
+  "download": "https://github.com/GWagner2021/blind-skill-rolls/releases/download/v1.2.0/blind-skill-rolls.zip"
 }
