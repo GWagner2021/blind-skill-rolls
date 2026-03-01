@@ -4,11 +4,6 @@
   "use strict";
   const MOD = "blind-skill-rolls";
 
-  const STY = "color:#8B0000;font-weight:700;";
-  const tag = () => [`%c${MOD}%c`, STY, "color:inherit;"];
-  const log  = (...a) => { try { console.log(...tag(), ...a); } catch {} };
-  const warn = (...a) => { try { console.warn(...tag(), ...a); } catch {} };
-
   const L = (k, fb) => {
     try { const t = game?.i18n?.localize?.(k); return (t && t !== k) ? t : (fb ?? k); }
     catch { return fb ?? k; }

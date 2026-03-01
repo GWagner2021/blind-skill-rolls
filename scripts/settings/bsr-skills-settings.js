@@ -66,12 +66,12 @@
           await game.settings.set("midi-qol", "ConfigSettings", _configSettings);
       }
     } catch (e) {
-      globalThis.dbgWarn?.("BSR-Sync | Failed to update midi-qol settings:", e.message);
+      globalThis.dbgWarn?.("BSR-Sync | Failed to update midi-qol settings:", e);
     }
   }
   async function performInitialSync() {
     if (!isMidiQolAvailable()) {
-      globalThis.dbgWarn?.("BSR-Sync | midi-qol not active - sync disabled");
+      globalThis.dbgWInfo?.("BSR-Sync | midi-qol not active - sync disabled");
       return;
     }
     try {
@@ -81,7 +81,7 @@
       try {
         cfgSettings = game.settings.get("midi-qol", "ConfigSettings");
       } catch (e) {
-        globalThis.dbgWarn?.("BSR-Sync | midi-qol ConfigSettings not found:", e.message);
+        globalThis.dbgWarn?.("BSR-Sync | midi-qol ConfigSettings not found:", e);
         return;
       }
       let new_blindList = [];
@@ -95,7 +95,7 @@
       let allBlind = new_blindList.length === skillList.length;
       cfgSettings.rollSkillsBlind = allBlind ? ["all"] : new_blindList;
       await updateMidiQOLConfig(cfgSettings);
-      globalThis.dbgWarn?.(`BSR-Sync | Initial sync complete: ${new_blindList.length} blind skills → midi-qol`);
+      globalThis.dbgInfo?.(`BSR-Sync | Initial sync complete: ${new_blindList.length} blind skills → midi-qol`);
       showNotification(game.i18n.localize("BLINDSKILLROLLS.UINotification.BSRMIDIInitSync"));
     } catch (e) {
       globalThis.dbgWarn?.("BSR-Sync | Initial sync error:", e);
@@ -122,7 +122,7 @@
       try {
         cfgSettings = game.settings.get("midi-qol", "ConfigSettings");
       } catch (e) {
-        globalThis.dbgWarn?.("BSR-Sync | Failed to get midi-qol ConfigSettings:", e.message);
+        globalThis.dbgWarn?.("BSR-Sync | Failed to get midi-qol ConfigSettings:", e);
         return;
       }
       let new_blindList = [];
@@ -134,7 +134,7 @@
       let allBlind = new_blindList.length === skillList.length;
       cfgSettings.rollSkillsBlind = allBlind ? ["all"] : new_blindList;
       await updateMidiQOLConfig(cfgSettings);
-      globalThis.dbgWarn?.(`BSR-Sync | Synced ${new_blindList.length} blind skills to midi-qol`);
+      globalThis.dbgWarn?.(`BSR-Sync | Synced ${new_blindList.length} blind skills to midi-qol`, e);
       showNotification(`${game.i18n.localize("BLINDSKILLROLLS.UINotification.Synced")}  ${new_blindList.length}   ${game.i18n.localize("BLINDSKILLROLLS.UINotification.BSRToMIDIQ")}`);
     } catch (e) {
       globalThis.dbgWarn?.("BSR-Sync | Sync error (BSR → midi):", e);
@@ -165,7 +165,7 @@
         try {
           cfgSettings = game.settings.get("midi-qol", "ConfigSettings");
         } catch (e) {
-          globalThis.dbgWarn?.("BSR-Sync | Failed to get midi-qol ConfigSettings:", e.message);
+          globalThis.dbgWarn?.("BSR-Sync | Failed to get midi-qol ConfigSettings:", e);
           return;
         }
         let new_blindList = cfgSettings.rollSkillsBlind || [];
@@ -219,7 +219,7 @@
       await performInitialSync();
     }, 500);
   });
-  globalThis.dbgWarn?.("BSR-Sync | Script loaded");
+  globalThis.dbgInfo?.("BSR-Sync | Script loaded");
   window.BSR_102.load_count += 1;
 })();
 

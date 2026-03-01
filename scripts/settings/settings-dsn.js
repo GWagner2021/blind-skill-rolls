@@ -54,9 +54,9 @@
           "2": L("DICESONICE.ghostDiceForRollAuthor")
         },
         default: "2",
-        onChange: (v) => { if (game.user?.isGM) BSR.setDsnGhost(String(v)).catch(console.warn); }
+        onChange: (v) => { if (game.user?.isGM) BSR.setDsnGhost(String(v)).catch(globalThis.dbgInfo?.("BSR | DSN proxy onChange")); }
       });
-      globalThis.dbgWarn?.("BSR | DSN proxy setting registered.");
+      globalThis.dbgInfo?.("BSR | DSN proxy setting registered.");
       window.BSR_102.load_count += 1;
     } catch (e) {
       console.error(game.i18n.localize("BLINDSKILLROLLS.Log.FailedDSNProxyRegistration"), e);
@@ -81,7 +81,7 @@
       if (!game.modules.get(DSN_MOD)?.active) return;
       await BSR.setDsnGhost(v, { silent: true });
     } catch (e) {
-      console.warn(game.i18n.localize("BLINDSKILLROLLS.Log.BSRReadySyncFailed"), e);
+      globalThis.dbgWarn?.(game.i18n.localize("BLINDSKILLROLLS.Log.BSRReadySyncFailed"), e);
     }
   });
 })();

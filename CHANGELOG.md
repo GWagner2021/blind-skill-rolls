@@ -1,6 +1,14 @@
 ## [Unreleased]
 _TBD_
 
+## [1.2.1] - 2026-03-01
+### Added
+- **Troubleshooter**
+  - Added a new Troubleshooter menu that generates a JSON report (Foundry/system/module versions, BSR settings dump, installed modules list, optional MidiQOL snapshot)
+
+### Changed
+- Refined skill roll handling to improve reliability and compatibility on Foundry v13+.
+
 ## [1.2.0] - 2026-02-19
 ### Added
 - **NPC Masking 2.0**

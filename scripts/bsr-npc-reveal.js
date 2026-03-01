@@ -381,7 +381,7 @@
       installObserver(li);
       updateButtonIcon(li);
     } catch (e) {
-      console.warn(game.i18n.localize("BLINDSKILLROLLS.Log.NPCRLRCMHFailed"), e);
+      globalThis.dbgWarn?.(game.i18n.localize("BLINDSKILLROLLS.Log.NPCRLRCMHFailed"), e);
     }
   });
 

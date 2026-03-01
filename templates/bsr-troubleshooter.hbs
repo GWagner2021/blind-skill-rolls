@@ -1,0 +1,153 @@
+<div class="bsr-ts__window">
+  <nav class="bsr-ts__tabs">
+    <button type="button" class="bsr-ts__tab {{#if (eq activeTab 'summary')}}is-active{{/if}}" data-tab="summary">Summary</button>
+    <button type="button" class="bsr-ts__tab {{#if (eq activeTab 'problems')}}is-active{{/if}}" data-tab="problems">Problems</button>
+    <button type="button" class="bsr-ts__tab {{#if (eq activeTab 'all')}}is-active{{/if}}" data-tab="all">All Modules</button>
+  </nav>
+
+  <section class="bsr-ts__body">
+
+    {{#if (eq activeTab 'summary')}}
+      <div class="bsr-ts__card">
+        <h2 class="bsr-ts__sectionTitle">Local Client Settings</h2>
+        <table class="bsr-ts__table bsr-ts__table--kv">
+          <tbody>
+            {{#each summaryRows}}
+              <tr>
+                <td class="bsr-ts__kvKey">{{label}}</td>
+                <td class="bsr-ts__kvVal">{{value}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bsr-ts__card">
+        <h2 class="bsr-ts__sectionTitle">BSR Settings</h2>
+
+        {{#each bsrSettingsGroups}}
+          <div class="bsr-ts__group">
+            <div class="bsr-ts__groupHeader">{{group}}</div>
+
+            <table class="bsr-ts__table bsr-ts__table--fixed">
+              <thead>
+                <tr>
+                  <th class="bsr-ts__colSetting">Setting</th>
+                  <th class="bsr-ts__colValue">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each items}}
+                  <tr>
+                    <td class="bsr-ts__settingName">{{name}}</td>
+                    <td class="bsr-ts__settingValue">{{value}}</td>
+                  </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+        {{/each}}
+
+        {{#if midiSettingsRows.length}}
+          <div class="bsr-ts__group" style="margin-top:18px;">
+            <div class="bsr-ts__groupHeader">MidiQOL Settings</div>
+
+            <table class="bsr-ts__table bsr-ts__table--fixed">
+              <thead>
+                <tr>
+                  <th class="bsr-ts__colSetting">Setting</th>
+                  <th class="bsr-ts__colValue">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each midiSettingsRows}}
+                  <tr>
+                    <td class="bsr-ts__settingName">{{label}}</td>
+                    <td class="bsr-ts__settingValue">{{value}}</td>
+                  </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+        {{/if}}
+      </div>
+    {{/if}}
+
+    {{#if (eq activeTab 'problems')}}
+      <div class="bsr-ts__card">
+        <h2 class="bsr-ts__sectionTitle">BSR / MidiQOL Console Output</h2>
+
+        <p class="bsr-ts__muted" style="margin-top:-6px;">
+          This list captures console output that contains "BSR/blind-skill-rolls" or "midi-qol/MidiQOL".
+          Reproduce the issue, then come back here.
+        </p>
+
+        <table class="bsr-ts__table">
+          <thead>
+            <tr>
+              <th style="width:180px;">Time</th>
+              <th style="width:90px;">Level</th>
+              <th style="width:160px;">Source</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each problemsRows}}
+              <tr>
+                <td class="bsr-ts__mono">{{time}}</td>
+                <td class="bsr-ts__mono">{{level}}</td>
+                <td class="bsr-ts__mono">{{source}}</td>
+                <td class="bsr-ts__mono">{{message}}</td>
+              </tr>
+            {{/each}}
+
+            {{#unless problemsRows.length}}
+              <tr>
+                <td colspan="4" class="bsr-ts__muted">No BSR/MidiQOL related console output captured yet.</td>
+              </tr>
+            {{/unless}}
+          </tbody>
+        </table>
+
+        <p class="bsr-ts__muted">Tip: Use "Export Data" to include captured logs in the JSON report.</p>
+      </div>
+    {{/if}}
+
+    {{#if (eq activeTab 'all')}}
+      <div class="bsr-ts__card">
+        <h2 class="bsr-ts__sectionTitle">All Installed Modules</h2>
+        <table class="bsr-ts__table">
+          <thead>
+            <tr>
+              <th>Module id</th>
+              <th>Active</th>
+              <th>Title</th>
+              <th>Version</th>
+              <th>Foundry</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each allModulesRows}}
+              <tr>
+                <td class="bsr-ts__mono">{{id}}</td>
+                <td>{{#if active}}true{{else}}false{{/if}}</td>
+                <td>{{title}}</td>
+                <td class="bsr-ts__mono">{{version}}</td>
+                <td class="bsr-ts__mono">{{foundry}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+    {{/if}}
+
+  </section>
+
+  <footer class="bsr-ts__footer">
+    <button type="button" data-action="reload"><i class="fas fa-sync"></i> Reload Application</button>
+    <button type="button" data-action="clearLog"><i class="fas fa-trash"></i> Clear Log</button>
+    <button type="button" data-action="export"><i class="fas fa-file-export"></i> Export Data</button>
+  </footer>
+
+  <textarea data-json class="bsr-ts__hiddenJson">{{reportJson}}</textarea>
+</div>

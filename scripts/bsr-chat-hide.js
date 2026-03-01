@@ -58,7 +58,7 @@
             setTimeout(() => {
                 const chatLog = document.querySelector('#chat-log');
                 if (!chatLog) {
-                    globalThis.dbgWarn?.("Chat Message Hider: Chat log not found");
+                    globalThis.dbgDebug?.("BSR | Chat Message Hider: Chat log not found");
                     return;
                 }
 
@@ -97,12 +97,6 @@
 (() => {
   "use strict";
   const MOD = "blind-skill-rolls";
-
-  // ----- Logger -----
-  const STY = "color:#8B0000;font-weight:700;";
-  const tag = () => [`%c${MOD}%c`, STY, "color:inherit;"];
-  const log  = (...a) => { try { console.log(...tag(), ...a); } catch {} };
-  const warn = (...a) => { try { console.warn(...tag(), ...a); } catch {} };
 
   // ----- i18n -----
   const L  = (k, fb) => { try { const t = game?.i18n?.localize?.(k); return (t && t !== k) ? t : (fb ?? k); } catch { return fb ?? k; } };
@@ -236,7 +230,7 @@
 
   Hooks.on("renderChatMessageHTML", (msg, el) => {
     try { if (!el) return; shouldHideForMe(msg) ? el.removeAttribute("data-bsr-visible") : el.setAttribute("data-bsr-visible","1"); }
-    catch(e){ warn(game.i18n.localize("BLINDSKILLROLLS.Log.RCMHTMLMarkFailed"), e); }
+    catch(e){ globalThis.dbgWarn?.(game.i18n.localize("BLINDSKILLROLLS.Log.RCMHTMLMarkFailed"), e); }
   });
   Hooks.on("createChatMessage", ()=>{ try { sweepAllRoots(); setTimeout(sweepAllRoots,0); } catch {} });
 
@@ -317,7 +311,7 @@
         };
         PATCHED.audio=true;
       }
-    } catch(e){ warn(game.i18n.localize("BLINDSKILLROLLS.Log.AudioPatchFailed"), e); }
+    } catch(e){ globalThis.dbgWarn?.(game.i18n.localize("BLINDSKILLROLLS.Log.AudioPatchFailed"), e); }
   }
   function patchFoundrySoundClass(){
     if (PATCHED.sound) return;
@@ -335,7 +329,7 @@
       };
       foundry.audio.Sound.prototype.play._bsrPatched=true;
       PATCHED.sound=true;
-    } catch(e){ warn(game.i18n.localize("BLINDSKILLROLLS.Log.SPPPatchFailed"), e); }
+    } catch(e){ globalThis.dbgWarn?.(game.i18n.localize("BLINDSKILLROLLS.Log.SPPPatchFailed"), e); }
   }
   function patchHowlerPlay(){
     if (PATCHED.howl) return;
@@ -354,7 +348,7 @@
         Howl.prototype.play._bsrPatched=true;
         PATCHED.howl=true;
       }
-    } catch(e){ warn(game.i18n.localize("BLINDSKILLROLLS.Log.HowlerPatchFailed"), e); }
+    } catch(e){ globalThis.dbgWarn?.(game.i18n.localize("BLINDSKILLROLLS.Log.HowlerPatchFailed"), e); }
   }
   function patchHTMLAudioPlay(){
     if (PATCHED.html) return;
@@ -372,7 +366,7 @@
       };
       P.play._bsrPatched=true;
       PATCHED.html=true;
-    } catch(e){ warn(game.i18n.localize("BLINDSKILLROLLS.Log.HTMLAPatchFailed"), e); }
+    } catch(e){ globalThis.dbgWarn?.(game.i18n.localize("BLINDSKILLROLLS.Log.HTMLAPatchFailed"), e); }
   }
   function installAudioPatches(){
     patchAudioHelperPlay();
@@ -417,12 +411,10 @@
 
     sweepAllRoots(); setTimeout(sweepAllRoots, 0); setTimeout(()=>sweepAllRoots(), 80);
 
-    if (globalThis.BSR_DEBUG === true) {
-      log(LF("BLINDSKILLROLLS.Log.ReadyText",
+    globalThis.dbgDebug?.(LF("BLINDSKILLROLLS.Log.ReadyText",
         { hide: String(OPT_HIDE()), mute: String(OPT_MUTE()) },
         `ready | hide=${OPT_HIDE()} | mute=${OPT_MUTE()}`
       ));
-    }
 
     window.BSR_102.load_count += 1;
   });

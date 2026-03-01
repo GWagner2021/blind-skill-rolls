@@ -72,11 +72,11 @@
   "BLINDSKILLROLLS.Log.HowlerPatchFailed": "Howler patch failed",
   "BLINDSKILLROLLS.Log.HTMLAPatchFailed": "HTMLAudio patch failed",
 
-  "BLINDSKILLROLLS.Log.NPCRLRCMHFailed": "[BSR] npc-reveal-live renderChatMessageHTML failed",
+  "BLINDSKILLROLLS.Log.NPCRLRCMHFailed": "BSR | npc-reveal-live renderChatMessageHTML failed",
   "BLINDSKILLROLLS.Log.FLVFileFailedLoad": "File failed to load:",
   "BLINDSKILLROLLS.Log.FLVReason": "Reason:",
 
-  "BLINDSKILLROLLS.UINotification.BSRMIDIInitSync": "Blind skills synced on startup",
+  "BLINDSKILLROLLS.UINotification.BSRMIDIInitSync": "BSR | Blind skills synced on startup",
   "BLINDSKILLROLLS.UINotification.Synced": "Synced ",
   "BLINDSKILLROLLS.UINotification.BSRToMIDIQ": "blind skills to midi-qol",
   "BLINDSKILLROLLS.UINotification.BSRFromMIDIQ": "blind skills from midi-qol",

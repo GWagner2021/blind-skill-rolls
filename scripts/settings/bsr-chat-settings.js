@@ -4,12 +4,6 @@
   "use strict";
   const MOD = "blind-skill-rolls";
 
-  // Logger
-  const STY = "color:#8B0000;font-weight:700;";
-  const tag = () => [`%c${MOD}%c`, STY, "color:inherit;"];
-  const log  = (...a) => { try { console.log(...tag(), ...a); } catch {} };
-  const warn = (...a) => { try { console.warn(...tag(), ...a); } catch {} };
-
   // i18n helper
   const L = (k, fb) => {
     try { const t = game?.i18n?.localize?.(k); return (t && t !== k) ? t : (fb ?? k); }
@@ -255,7 +249,7 @@
       restricted: true
     });
 
-    globalThis.dbgWarn?.("BSR| chat + gm-rolls + npc settings registered (single menu)");
+    globalThis.dbgInfo?.("BSR | Settings registered: Chat Privacy, GM Roll Privacy, NPC Masking");
   });
 
   function injectChatDisplayControls(_app, jqOrHtml) {
@@ -345,7 +339,7 @@
         );
       }
     } catch (e) {
-      globalThis.dbgWarn?.("BSR| inject Chat Display controls failed", e);
+      globalThis.dbgWarn?.("BSR | Inject Chat Display controls failed", e);
     }
   }
 

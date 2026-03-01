@@ -44,7 +44,7 @@
 
       const content = el.querySelector(".message-content") ?? el;
       stripFormulasAndTooltips(content);
-    } catch (e) { globalThis.dbgWarn?.("[BSR] sanitize public GM roll", e); }
+    } catch (e) { globalThis.dbgWarn?.("BSR | sanitize public GM roll", e); }
   });
 })();
 window.BSR_102.load_count += 1;
