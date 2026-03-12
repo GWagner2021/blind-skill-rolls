@@ -16,29 +16,81 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Nächste Version berechnen
+      - name: Version aus module.json lesen
         shell: bash
         run: |
-          BASE_VERSION="1.2"
-          LAST_TAG=$(git tag -l "v${BASE_VERSION}.*" --sort=-v:refname | head -n 1)
+          test -f module.json
 
-          if [ -z "$LAST_TAG" ]; then
-            VERSION_NUMBER="${BASE_VERSION}.0"
-          else
-            LAST_PATCH="${LAST_TAG##*.}"
-            NEXT_PATCH=$((LAST_PATCH + 1))
-            VERSION_NUMBER="${BASE_VERSION}.${NEXT_PATCH}"
+          python3 - <<'PY'
+          import json
+          import os
+
+          with open("module.json", "r", encoding="utf-8") as f:
+              data = json.load(f)
+
+          version = str(data.get("version", "")).strip()
+          if not version:
+              raise SystemExit("module.json enthält keine gültige 'version'.")
+
+          env_file = os.environ["GITHUB_ENV"]
+          with open(env_file, "a", encoding="utf-8") as env:
+              env.write(f"VERSION_NUMBER={version}\n")
+              env.write(f"VERSION_TAG=v{version}\n")
+              env.write(f"VERSION_NAME=Version {version}\n")
+          PY
+
+      - name: Prüfen, ob Tag schon existiert
+        shell: bash
+        run: |
+          if git show-ref --tags --verify --quiet "refs/tags/${VERSION_TAG}"; then
+            echo "::error title=Tag existiert bereits::${VERSION_TAG} existiert schon. Erhöhe die version in module.json, bevor du ein neues Release startest."
+            exit 1
           fi
 
-          VERSION_TAG="v${VERSION_NUMBER}"
-          VERSION_NAME="Version ${VERSION_NUMBER}"
+      - name: Prüfen, ob module.json zu Version und Download-URL passt
+        shell: bash
+        run: |
+          EXPECTED_DOWNLOAD="https://github.com/${GITHUB_REPOSITORY}/releases/download/${VERSION_TAG}/blind-skill-rolls.zip"
 
-          echo "VERSION_NUMBER=${VERSION_NUMBER}" >> "$GITHUB_ENV"
-          echo "VERSION_TAG=${VERSION_TAG}" >> "$GITHUB_ENV"
-          echo "VERSION_NAME=${VERSION_NAME}" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json
+          import os
+          import sys
 
-      - name: Prüfen, ob module.json existiert
-        run: test -f module.json
+          try:
+              with open("module.json", "r", encoding="utf-8") as f:
+                  data = json.load(f)
+          except FileNotFoundError:
+              print("::error title=module.json fehlt::Die Datei module.json wurde nicht gefunden.")
+              sys.exit(1)
+          except json.JSONDecodeError as e:
+              print(f"::error title=module.json ist ungültiges JSON::{e}")
+              sys.exit(1)
+
+          version = str(data.get("version", "")).strip()
+          download = str(data.get("download", "")).strip()
+
+          expected_version = os.environ["VERSION_NUMBER"]
+          expected_download = os.environ["EXPECTED_DOWNLOAD"]
+
+          failed = False
+
+          if version != expected_version:
+              print(f"::error title=Version stimmt nicht::module.json version='{version}', erwartet='{expected_version}'")
+              failed = True
+
+          if download != expected_download:
+              print("::error title=Download-URL stimmt nicht::"
+                    f"module.json download='{download}' | erwartet='{expected_download}'")
+              failed = True
+
+          if failed:
+              sys.exit(1)
+
+          print("module.json passt zu Version und Download-URL.")
+          PY
+        env:
+          EXPECTED_DOWNLOAD: https://github.com/${{ github.repository }}/releases/download/${{ env.VERSION_TAG }}/blind-skill-rolls.zip
 
       - name: ZIP bauen
         run: git archive --format=zip --output blind-skill-rolls.zip HEAD
@@ -97,3 +149,6 @@ jobs:
                 'content-length': moduleSize
               }
             });
+        env:
+          VERSION_TAG: ${{ env.VERSION_TAG }}
+          VERSION_NAME: ${{ env.VERSION_NAME }}
