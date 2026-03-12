@@ -1,0 +1,99 @@
+name: Build ZIP and publish release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Nächste Version berechnen
+        shell: bash
+        run: |
+          BASE_VERSION="1.2"
+          LAST_TAG=$(git tag -l "v${BASE_VERSION}.*" --sort=-v:refname | head -n 1)
+
+          if [ -z "$LAST_TAG" ]; then
+            VERSION_NUMBER="${BASE_VERSION}.0"
+          else
+            LAST_PATCH="${LAST_TAG##*.}"
+            NEXT_PATCH=$((LAST_PATCH + 1))
+            VERSION_NUMBER="${BASE_VERSION}.${NEXT_PATCH}"
+          fi
+
+          VERSION_TAG="v${VERSION_NUMBER}"
+          VERSION_NAME="Version ${VERSION_NUMBER}"
+
+          echo "VERSION_NUMBER=${VERSION_NUMBER}" >> "$GITHUB_ENV"
+          echo "VERSION_TAG=${VERSION_TAG}" >> "$GITHUB_ENV"
+          echo "VERSION_NAME=${VERSION_NAME}" >> "$GITHUB_ENV"
+
+      - name: Prüfen, ob module.json existiert
+        run: test -f module.json
+
+      - name: ZIP bauen
+        run: git archive --format=zip --output blind-skill-rolls.zip HEAD
+
+      - name: Release erstellen und Assets hochladen
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+
+            const zipPath = 'blind-skill-rolls.zip';
+            const modulePath = 'module.json';
+            const tag = process.env.VERSION_TAG;
+            const name = process.env.VERSION_NAME;
+
+            const release = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+              target_commitish: context.sha,
+              name: name,
+              draft: false,
+              prerelease: false,
+              generate_release_notes: true
+            });
+
+            const release_id = release.data.id;
+
+            const zipData = fs.readFileSync(zipPath);
+            const zipSize = fs.statSync(zipPath).size;
+
+            await github.rest.repos.uploadReleaseAsset({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id,
+              name: 'blind-skill-rolls.zip',
+              data: zipData,
+              headers: {
+                'content-type': 'application/zip',
+                'content-length': zipSize
+              }
+            });
+
+            const moduleData = fs.readFileSync(modulePath);
+            const moduleSize = fs.statSync(modulePath).size;
+
+            await github.rest.repos.uploadReleaseAsset({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id,
+              name: 'module.json',
+              data: moduleData,
+              headers: {
+                'content-type': 'application/json',
+                'content-length': moduleSize
+              }
+            });
