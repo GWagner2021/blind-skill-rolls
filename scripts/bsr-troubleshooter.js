@@ -5,49 +5,62 @@
   const MOD = "blind-skill-rolls";
   const FILE_NAME = "fvtt-bsr-troubleshooter.json";
 
-      // -----------------------------
-      // Debug mode (client setting)
-      // -----------------------------
-      globalThis.BSR_DEBUG_MODE ??= "none";
+  // -----------------------------
+  // Debug mode (client setting)
+  // -----------------------------
+  globalThis.BSR_DEBUG_MODE ??= "none";
 
-      const BSR_DEBUG_LEVELS = Object.freeze({
-        none: 0,
-        info: 1,
-        warnings: 2,
-        debug: 3,
-        all: 4
-      });
+  const BSR_DEBUG_LEVELS = Object.freeze({
+    none: 0,
+    info: 1,
+    warnings: 2,
+    debug: 3,
+    all: 4
+  });
 
-      const bsrNormalizeDebugMode = (v) => {
-        const m = String(v ?? "none").toLowerCase();
-        return Object.prototype.hasOwnProperty.call(BSR_DEBUG_LEVELS, m) ? m : "none";
-      };
+  const bsrNormalizeDebugMode = (v) => {
+    const m = String(v ?? "none").toLowerCase();
+    return Object.prototype.hasOwnProperty.call(BSR_DEBUG_LEVELS, m) ? m : "none";
+  };
 
-      const bsrDebugLevel = () => BSR_DEBUG_LEVELS[bsrNormalizeDebugMode(globalThis.BSR_DEBUG_MODE)];
+  const bsrDebugLevel = () => BSR_DEBUG_LEVELS[bsrNormalizeDebugMode(globalThis.BSR_DEBUG_MODE)];
 
-      const bsrApplyDebugMode = (mode) => {
-        const m = bsrNormalizeDebugMode(mode);
-        globalThis.BSR_DEBUG_MODE = m;
-        return m;
-      };
+  const bsrApplyDebugMode = (mode) => {
+    const m = bsrNormalizeDebugMode(mode);
+    globalThis.BSR_DEBUG_MODE = m;
+    return m;
+  };
 
-      // Public helpers
-      globalThis.BSR_setDebugMode ??= bsrApplyDebugMode;
-      globalThis.BSR_getDebugMode ??= () => bsrNormalizeDebugMode(globalThis.BSR_DEBUG_MODE);
-      globalThis.BSR_getDebugLevel ??= () => bsrDebugLevel();
-      globalThis.BSR_isDebugAtLeast ??= (mode) => bsrDebugLevel() >= BSR_DEBUG_LEVELS[bsrNormalizeDebugMode(mode)];
+  // Public helpers
+  globalThis.BSR_setDebugMode ??= bsrApplyDebugMode;
+  globalThis.BSR_getDebugMode ??= () => bsrNormalizeDebugMode(globalThis.BSR_DEBUG_MODE);
+  globalThis.BSR_getDebugLevel ??= () => bsrDebugLevel();
+  globalThis.BSR_isDebugAtLeast ??= (mode) =>
+    bsrDebugLevel() >= BSR_DEBUG_LEVELS[bsrNormalizeDebugMode(mode)];
 
-      // Logging helpers
-      globalThis.dbgWarn  ??= (...args) => { if (bsrDebugLevel() >= BSR_DEBUG_LEVELS.warnings) console.warn(...args); };
-      globalThis.dbgInfo  ??= (...args) => { if (bsrDebugLevel() >= BSR_DEBUG_LEVELS.info)     console.info(...args); };
-      globalThis.dbgDebug ??= (...args) => { if (bsrDebugLevel() >= BSR_DEBUG_LEVELS.debug)    console.debug(...args); };
-      globalThis.dbgAll   ??= (...args) => { if (bsrDebugLevel() >= BSR_DEBUG_LEVELS.all)      console.log(...args); };
-      
+  // Logging helpers
+  globalThis.dbgWarn ??= (...args) => {
+    if (bsrDebugLevel() >= BSR_DEBUG_LEVELS.warnings) console.warn(...args);
+  };
+  globalThis.dbgInfo ??= (...args) => {
+    if (bsrDebugLevel() >= BSR_DEBUG_LEVELS.info) console.info(...args);
+  };
+  globalThis.dbgDebug ??= (...args) => {
+    if (bsrDebugLevel() >= BSR_DEBUG_LEVELS.debug) console.debug(...args);
+  };
+  globalThis.dbgAll ??= (...args) => {
+    if (bsrDebugLevel() >= BSR_DEBUG_LEVELS.all) console.log(...args);
+  };
+
   // -----------------------------
   // Helpers
   // -----------------------------
   const safeGetSetting = (namespace, key, fallback = null) => {
-    try { return game.settings.get(namespace, key); } catch { return fallback; }
+    try {
+      return game.settings.get(namespace, key);
+    } catch {
+      return fallback;
+    }
   };
 
   const safeJson = (value) => {
@@ -55,8 +68,14 @@
     if (value === null) return null;
     const t = typeof value;
     if (t === "string" || t === "number" || t === "boolean") return value;
-    try { return JSON.parse(JSON.stringify(value)); } catch {
-      try { return String(value); } catch { return "<unserializable>"; }
+    try {
+      return JSON.parse(JSON.stringify(value));
+    } catch {
+      try {
+        return String(value);
+      } catch {
+        return "<unserializable>";
+      }
     }
   };
 
@@ -64,7 +83,11 @@
     if (v === null) return "null";
     if (v === undefined) return "undefined";
     if (typeof v === "string") return v;
-    try { return JSON.stringify(v); } catch { return String(v); }
+    try {
+      return JSON.stringify(v);
+    } catch {
+      return String(v);
+    }
   };
 
   const downloadJsonText = (text) => {
@@ -119,6 +142,7 @@
           type: setting.type?.name ?? typeof value
         });
       }
+
       out.sort((a, b) => a.key.localeCompare(b.key));
       return out;
     } catch {
@@ -130,14 +154,17 @@
   // Settings display: readable names + grouping
   // -----------------------------
   const SKILL_KEYS = new Set([
-    "acr","ani","arc","ath","dec","his","ins","itm","inv","med","nat","prc","per","prf","rel","slt","ste","sur"
+    "acr", "ani", "arc", "ath", "dec", "his", "ins", "itm", "inv",
+    "med", "nat", "prc", "per", "prf", "rel", "slt", "ste", "sur"
   ]);
 
   const getSkillLabel = (key) => {
     try {
       const entry = CONFIG?.DND5E?.skills?.[key];
       return entry?.label ?? null;
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   };
 
   const localizeMaybe = (s) => {
@@ -197,7 +224,7 @@
   ];
 
   // -----------------------------
-  // MidiQOL summary 
+  // MidiQOL summary
   // -----------------------------
   const getPath = (obj, path) => {
     if (!obj) return undefined;
@@ -287,18 +314,21 @@
     if (v === undefined) return "undefined";
     if (typeof v === "string") return v;
     if (v instanceof Error) return `${v.message}\n${v.stack ?? ""}`.trim();
-    try { return JSON.stringify(v); } catch {
-      try { return String(v); } catch { return "<unprintable>"; }
+    try {
+      return JSON.stringify(v);
+    } catch {
+      try {
+        return String(v);
+      } catch {
+        return "<unprintable>";
+      }
     }
   };
 
   const shouldCapture = (text) => {
     const t = String(text ?? "").toLowerCase();
 
-    // BSR
     if (t.includes("blind-skill-rolls") || t.includes("blind skill rolls") || t.includes("bsr")) return true;
-
-    // MidiQOL
     if (t.includes("midi-qol") || t.includes("midi qol") || t.includes("midiqol")) return true;
 
     return false;
@@ -329,10 +359,13 @@
           const combined = args.map(normalizeToString).join(" ");
           if (shouldCapture(combined)) {
             let stack = null;
-            try { stack = new Error().stack ?? null; } catch {}
+            try {
+              stack = new Error().stack ?? null;
+            } catch {}
             pushLog({ level, message: combined, stack, source: `console.${method}` });
           }
         } catch {}
+
         return orig.apply(this, args);
       };
     };
@@ -341,7 +374,6 @@
     wrap("error", "error");
     wrap("warn", "warn");
 
-    // window errors
     window.addEventListener("error", (ev) => {
       try {
         const err = ev?.error;
@@ -356,26 +388,30 @@
       } catch {}
     });
 
-    // Hook errors
-    const originalOnError = Hooks.onError ?? (() => {});
-    Hooks.onError = new Proxy(originalOnError, {
-      apply(target, thisArg, argArray) {
-        try {
-          const [where, err] = argArray ?? [];
-          const msg = err?.message ?? String(err);
-          const stack = err?.stack ?? null;
-          const combined = `${String(where ?? "")} ${msg}`.trim();
+    window.addEventListener("unhandledrejection", (ev) => {
+      try {
+        const reason = ev?.reason;
+        const msg = reason?.message ?? String(reason ?? "Unhandled promise rejection");
+        const stack = reason?.stack ?? null;
 
-          if (shouldCapture(combined) || shouldCapture(stack)) {
-            pushLog({ level: "error", message: combined, stack, source: "Hooks.onError" });
-          }
-        } catch {}
-        return Reflect.apply(target, thisArg, argArray);
-      }
+        if (shouldCapture(msg) || shouldCapture(stack)) {
+          pushLog({
+            level: "error",
+            message: msg,
+            stack,
+            source: "window.unhandledrejection"
+          });
+        }
+      } catch {}
     });
+
+    // Intentionally do NOT patch Hooks.onError here.
+    // Wrapping it can recurse with libWrapper during startup/world load.
   }
 
-  const clearLog = () => { logBuffer.length = 0; };
+  const clearLog = () => {
+    logBuffer.length = 0;
+  };
 
   // -----------------------------
   // JSON report
@@ -428,7 +464,7 @@
         isActiveGM: !!game.user?.isActiveGM
       },
       browser: {
-        userAgent: (typeof navigator !== "undefined" ? navigator.userAgent : null)
+        userAgent: typeof navigator !== "undefined" ? navigator.userAgent : null
       },
       bsrSettings,
       midiQol,
@@ -460,28 +496,26 @@
       const report = buildReportObject();
       const modules = report.modules ?? [];
 
-        const allModulesRows = modules
-            .map(m => ({
-                id: m.id,
-                title: m.title,
-                active: !!m.active,
-                version: m.version ?? "",
-                foundry: m.compatibility?.verified ?? m.compatibility?.minimum ?? ""
-            }))
-            .sort((a, b) => {
-                // active first
-                if (a.active !== b.active) return a.active ? -1 : 1;
+      const allModulesRows = modules
+        .map((m) => ({
+          id: m.id,
+          title: m.title,
+          active: !!m.active,
+          version: m.version ?? "",
+          foundry: m.compatibility?.verified ?? m.compatibility?.minimum ?? ""
+        }))
+        .sort((a, b) => {
+          if (a.active !== b.active) return a.active ? -1 : 1;
 
-                // then by title, fallback id
-                const at = (a.title ?? "").toLowerCase();
-                const bt = (b.title ?? "").toLowerCase();
-                if (at !== bt) return at.localeCompare(bt);
+          const at = (a.title ?? "").toLowerCase();
+          const bt = (b.title ?? "").toLowerCase();
+          if (at !== bt) return at.localeCompare(bt);
 
-                return (a.id ?? "").localeCompare(b.id ?? "");
-      });
+          return (a.id ?? "").localeCompare(b.id ?? "");
+        });
 
       const grouped = {};
-      for (const s of (report.bsrSettings ?? [])) {
+      for (const s of report.bsrSettings ?? []) {
         const group = groupNameForSetting(s.key);
         (grouped[group] ??= []).push({
           name: displayNameForSetting(s.key),
@@ -505,12 +539,15 @@
         { label: "Foundry Version", value: report.core?.foundryVersion ?? "" },
         { label: "System", value: `${report.system?.id ?? ""} ${report.system?.version ?? ""}`.trim() },
         { label: "BSR Version", value: report.module?.version ?? "" },
-        { label: "Module Count", value: `Active: ${modules.filter(m => m.active).length} | Installed: ${modules.length}` }
+        {
+          label: "Module Count",
+          value: `Active: ${modules.filter((m) => m.active).length} | Installed: ${modules.length}`
+        }
       ];
 
       const midiSettingsRows = buildMidiSummaryRows();
 
-      const problemsRows = (logBuffer ?? []).map(e => ({
+      const problemsRows = (logBuffer ?? []).map((e) => ({
         time: e.time,
         level: e.level,
         source: e.source,
@@ -534,7 +571,7 @@
       const root = this.element;
       if (!root) return;
 
-      root.querySelectorAll("[data-tab]").forEach(btn => {
+      root.querySelectorAll("[data-tab]").forEach((btn) => {
         btn.addEventListener("click", () => {
           this.#activeTab = btn.dataset.tab;
           this.render({ force: true });
@@ -572,29 +609,33 @@
         return fb ?? k;
       }
     };
+
     try {
-        game.settings.register(MOD, "debugMode", {
-          name: L("BSR.Settings.DebugMode.Name", "Debug mode"),
-          hint: L("BSR.Settings.DebugMode.Hint", "Controls how much BSR writes to the browser console."),
-          scope: "client",
-          config: true,
-          restricted: false,
-          type: String,
-          choices: {
-            none: L("BSR.Settings.DebugMode.None", "None"),
-            info: L("BSR.Settings.DebugMode.Info", "Info"),
-            warnings: L("BSR.Settings.DebugMode.Warnings", "Warnings"),
-            debug: L("BSR.Settings.DebugMode.Debug", "Debug"),
-            all: L("BSR.Settings.DebugMode.All", "All")
-          },
-          default: "none",
-          onChange: (value) => {
-            try { globalThis.BSR_setDebugMode?.(value); } catch {}
-          }
-        });
-      } catch (e) {
-        globalThis.dbgWarn?.("[BSR]", "Failed to register debug mode setting:", e);
-      }
+      game.settings.register(MOD, "debugMode", {
+        name: L("BSR.Settings.DebugMode.Name", "Debug mode"),
+        hint: L("BSR.Settings.DebugMode.Hint", "Controls how much BSR writes to the browser console."),
+        scope: "client",
+        config: true,
+        restricted: false,
+        type: String,
+        choices: {
+          none: L("BSR.Settings.DebugMode.None", "None"),
+          info: L("BSR.Settings.DebugMode.Info", "Info"),
+          warnings: L("BSR.Settings.DebugMode.Warnings", "Warnings"),
+          debug: L("BSR.Settings.DebugMode.Debug", "Debug"),
+          all: L("BSR.Settings.DebugMode.All", "All")
+        },
+        default: "none",
+        onChange: (value) => {
+          try {
+            globalThis.BSR_setDebugMode?.(value);
+          } catch {}
+        }
+      });
+    } catch (e) {
+      globalThis.dbgWarn?.("[BSR]", "Failed to register debug mode setting:", e);
+    }
+
     try {
       game.settings.registerMenu(MOD, "troubleshooter", {
         name: "Troubleshooter",
