@@ -4,7 +4,7 @@ _TBD_
 ## [1.2.2] - 2026-03-12
 ### Fixed
 - **Troubleshooter**
-- Fixed a startup freeze on Foundry VTT v13 where the Troubleshooter could recurse during world loading in combination with libWrapper.
+  - Fixed a startup freeze on Foundry VTT v13 where the Troubleshooter could recurse during world loading in combination with libWrapper.
 
 ## [1.2.1] - 2026-03-01
 ### Added
