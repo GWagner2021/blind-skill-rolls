@@ -1,6 +1,6 @@
 # Blind Skill Rolls (Foundry VTT · dnd5e)
 
-[![stable](https://img.shields.io/github/v/release/GWagner2021/blind-skill-rolls.svg?label=stable&display_name=tag&sort=date&cacheSeconds=3600&_=20260302)](https://github.com/GWagner2021/blind-skill-rolls/releases/latest) ![downloads](https://img.shields.io/github/downloads/GWagner2021/blind-skill-rolls/total?label=downloads) ![license](https://img.shields.io/github/license/GWagner2021/blind-skill-rolls?label=license)
+[![stable](https://img.shields.io/github/v/release/GWagner2021/blind-skill-rolls.svg?label=stable&display_name=tag&sort=date&cacheSeconds=3600&_=20260302)](https://github.com/GWagner2021/blind-skill-rolls/releases/latest) ![downloads](https://img.shields.io/github/downloads/GWagner2021/blind-skill-rolls/total?label=downloads) ![license](https://img.shields.io/github/license/GWagner2021/blind-skill-rolls?label=license) [![discord](https://img.shields.io/badge/discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/upVqdYqg4p)
 
 Automatically forces selected **DnD5e** skill checks and **Death Saves** into privacy-friendly roll modes (Blind / Private), with optional tools for chat privacy, NPC name masking and Dice So Nice ghost dice.
 The module is designed to work **with and without MidiQOL**. When MidiQOL is present, its roll handling is respected; when it’s not, Blind Skill Rolls falls back to the core dnd5e roll workflow.
@@ -151,3 +151,5 @@ open an issue with details about your setup.
 
 ## Support
 Issues & feedback: https://github.com/GWagner2021/blind-skill-rolls/issues
+
+Discord support (questions & reports without a GitHub account): https://discord.gg/upVqdYqg4p
