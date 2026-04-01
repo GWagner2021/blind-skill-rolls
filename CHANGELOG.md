@@ -1,6 +1,39 @@
 ## [Unreleased]
 _TBD_
 
+## [1.3.0] - 2026-04-02
+
+This release expands Blind Skill Rolls beyond skill checks with new saving throw support, private roll options, fast-forward controls, and broader Foundry/dnd5e compatibility updates.
+
+## Added
+- Added **Saving Throw** support, including per-save configuration for forced **Blind GM Roll** behavior.
+- Added **Private GM Roll** support for both **skills** and **saving throws**.
+- Added a unified **Skills & Saving Throws** configuration UI.
+- Added a new **Fast Forward** configuration menu with separate **GM** and **player** settings.
+- Added **Reveal to roller** support for blind roll chat messages.
+- Added a dedicated option to hide **blind saving throw chat messages** from the roller.
+- Added **permanent NPC reveal**.
+- Added GM-facing visual indicators for permanently revealed NPCs in chat and the combat tracker.
+- Added expanded localization entries for new roll types, privacy modes, fast-forward settings, and NPC reveal controls.
+
+## Changed
+- Updated compatibility from **Foundry VTT v13** to **Foundry VTT v14**.
+- Updated verified compatibility to **Foundry VTT 14.359**.
+- Added explicit **dnd5e 5.3.0** compatibility in the module manifest.
+- Reworked the old skill-only configuration into a broader **skills + saves** workflow.
+- Improved compatibility for blind rolls, saving throws, and fast-forward behavior in automated roll workflows.
+- Updated styling and templates to support the expanded UI and Foundry v14 rendering flow.
+
+## Fixed
+- Fixed roll-mode enforcement so configured blind/private rolls are re-applied after the roll configuration dialog is rendered.
+- Fixed several compatibility issues related to **Foundry v14**, **ApplicationV2**, and **dnd5e 5.3** roll handling.
+- Fixed save/skill roll detection in mixed workflows, especially when fast-forward skips the configuration dialog.
+- Fixed stale pending save state leaking into other roll types.
+- Fixed chat visibility handling so messages revealed to the original roller are no longer hidden incorrectly.
+- Improved private roll handling in supported display and automation workflows.
+- Improved author/whisper detection in chat and death save handling.
+- Improved NPC reveal refresh behavior when permanent reveal flags change.
+
 ## [1.2.2] - 2026-03-12
 ### Fixed
 - **Troubleshooter**
