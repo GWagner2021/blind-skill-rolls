@@ -10,67 +10,133 @@
 /* =========================
    BSR Troubleshooter
    ========================= */
-.bsr-ts__window { height: 100%; display: flex; flex-direction: column; gap: 10px; }
+.bsr-ts__window { height: 100%; display: flex; flex-direction: column; gap: 4px; }
 
 .bsr-ts__tabs {
-  display:flex; gap:8px;
+  display: flex; gap: 4px;
   border-bottom: 1px solid var(--color-border-light-2);
-  padding: 6px 6px 10px;
+  padding: 2px 4px 6px;
 }
 .bsr-ts__tab {
-  appearance:none; border: 1px solid transparent; background: transparent;
+  appearance: none; border: 1px solid transparent; background: transparent;
   color: var(--color-text-light-2);
-  padding: 8px 14px; border-radius: 10px; font-weight: 650;
+  padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 0.9em;
+  cursor: pointer; transition: background 0.15s, color 0.15s;
 }
-.bsr-ts__tab:hover { background: rgba(255,255,255,0.04); }
+.bsr-ts__tab:hover { background: rgba(255,255,255,0.05); color: var(--color-text-light-1); }
 .bsr-ts__tab.is-active {
   color: var(--color-text-light-0);
-  background: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.09);
   border-color: var(--color-border-light-2);
 }
 
-.bsr-ts__body { flex: 1; overflow: auto; padding: 0 6px 6px; display:flex; flex-direction:column; gap: 14px; }
+.bsr-ts__body { flex: 1; overflow: auto; padding: 0 4px 4px; display: flex; flex-direction: column; gap: 8px; }
 
 .bsr-ts__card {
   border: 1px solid var(--color-border-light-2);
-  border-radius: 14px;
+  border-radius: 8px;
   background: rgba(255,255,255,0.02);
-  padding: 12px;
+  padding: 8px 10px;
 }
 
-.bsr-ts__sectionTitle { margin: 0 0 10px; font-size: 1.15em; opacity: 0.96; }
+.bsr-ts__sectionTitle { margin: 0 0 6px; font-size: 1.0em; font-weight: 650; opacity: 0.96; }
 
-.bsr-ts__group { margin-top: 14px; }
-.bsr-ts__groupHeader {
-  padding: 10px 12px;
+/* Summary info strip */
+.bsr-ts__infoStrip {
+  display: flex; flex-wrap: wrap; gap: 6px 16px;
+  padding: 6px 10px;
   border: 1px solid var(--color-border-light-2);
-  border-radius: 12px 12px 0 0;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+  font-size: 0.88em;
+}
+.bsr-ts__infoItem { display: flex; gap: 5px; align-items: baseline; white-space: nowrap; }
+.bsr-ts__infoLabel { opacity: 0.7; font-weight: 600; }
+.bsr-ts__infoValue { font-weight: 500; }
+
+.bsr-ts__group { margin-top: 8px; }
+.bsr-ts__group:first-child { margin-top: 0; }
+.bsr-ts__groupHeader {
+  padding: 5px 10px;
+  border: 1px solid var(--color-border-light-2);
+  border-radius: 6px 6px 0 0;
   background: rgba(255,255,255,0.04);
-  font-weight: 700;
+  font-weight: 650; font-size: 0.88em;
   opacity: 0.95;
 }
 
-.bsr-ts__table { width:100%; border-collapse: collapse; }
+/* Colored tag in group headers (Blind / Private) */
+.bsr-ts__groupTag {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+/* Paired group row (side-by-side columns) */
+.bsr-ts__pairRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+.bsr-ts__pairRow:first-child { margin-top: 0; }
+.bsr-ts__pairRow .bsr-ts__group { margin-top: 0; }
+
+/* Per-column header setting shown above the group header */
+.bsr-ts__colHeader {
+  display: flex;
+  gap: 5px;
+  align-items: baseline;
+  padding: 4px 10px;
+  border: 1px solid var(--color-border-light-2);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  background: rgba(255,255,255,0.03);
+  font-size: 0.86em;
+  white-space: nowrap;
+}
+.bsr-ts__colHeaderName { opacity: 0.7; font-weight: 600; }
+.bsr-ts__colHeaderValue {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+  font-weight: 500;
+  font-size: 0.95em;
+  opacity: 0.9;
+}
+/* Group header directly below a column header loses top rounding */
+.bsr-ts__groupHeader--below {
+  border-radius: 0;
+  border-top: none;
+}
+
+.bsr-ts__table { width: 100%; border-collapse: collapse; }
 .bsr-ts__table th, .bsr-ts__table td {
-  padding: 10px 12px;
+  padding: 4px 8px;
   border-bottom: 1px solid var(--color-border-light-2);
   vertical-align: top;
+  font-size: 0.88em;
 }
 .bsr-ts__table thead th {
   position: sticky; top: 0;
   background: var(--color-bg);
   z-index: 1;
-  text-align:left;
+  text-align: left;
+  font-weight: 650;
+  font-size: 0.84em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  opacity: 0.8;
+  padding: 5px 8px;
 }
-.bsr-ts__table tbody tr:nth-child(odd) { background: rgba(255,255,255,0.02); }
-
-/* Key/Value table (summary) */
-.bsr-ts__table--kv td { border-bottom: 1px solid var(--color-border-light-2); }
-.bsr-ts__kvKey { width: 260px; opacity: 0.9; font-weight: 650; }
-.bsr-ts__kvVal { text-align: right; }
+.bsr-ts__table tbody tr:nth-child(odd) { background: rgba(255,255,255,0.015); }
 
 /* Fixed layout for settings so values align under each other */
-.bsr-ts__table--fixed { table-layout: fixed; border: 1px solid var(--color-border-light-2); border-top: none; border-radius: 0 0 12px 12px; overflow: hidden; }
+.bsr-ts__table--fixed {
+  table-layout: fixed;
+  border: 1px solid var(--color-border-light-2);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  overflow: hidden;
+}
+.bsr-ts__table--fixed thead { display: none; }
 .bsr-ts__colSetting { width: 62%; }
 .bsr-ts__colValue { width: 38%; text-align: left; }
 
@@ -79,19 +145,94 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
   white-space: pre-wrap;
   word-break: break-word;
+  font-size: 0.95em;
+  opacity: 0.9;
 }
+
+/* Active/inactive badge */
+.bsr-ts__badge {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 4px;
+  font-size: 0.82em;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.bsr-ts__badge--active { background: rgba(76,175,80,0.18); color: #66bb6a; }
+.bsr-ts__badge--inactive { background: rgba(255,255,255,0.05); color: var(--color-text-light-2); opacity: 0.6; }
 
 /* Footer */
 .bsr-ts__footer {
-  display:flex; gap: 10px;
-  padding: 10px 6px 6px;
+  display: flex; gap: 6px;
+  padding: 6px 4px 4px;
   border-top: 1px solid var(--color-border-light-2);
 }
 .bsr-ts__footer button {
-  flex: 1; padding: 10px;
-  border-radius: 12px; font-weight: 650;
+  flex: 1; padding: 6px 8px;
+  border-radius: 6px; font-weight: 600; font-size: 0.88em;
 }
 
-.bsr-ts__mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
-.bsr-ts__muted { opacity: 0.7; }
-.bsr-ts__hiddenJson { display:none; }
+.bsr-ts__mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+  font-size: 0.92em;
+}
+.bsr-ts__muted { opacity: 0.7; font-size: 0.88em; }
+.bsr-ts__hiddenJson { display: none; }
+
+/* =========================
+   BSR Skill Settings – compact two-column grid
+   ========================= */
+.bsr-skill-grid {
+  display: grid;
+  grid-template-columns: 1fr auto auto 1px 1fr auto auto;
+  gap: .2rem .6rem;
+  align-items: center;
+}
+.bsr-skill-grid__colhdr {
+  text-align: center;
+  font-size: 0.85em;
+}
+.bsr-skill-grid__name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bsr-skill-grid__cb {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.bsr-skill-grid__sep {
+  background: var(--color-border-light-2, #ccc);
+  width: 1px;
+  align-self: stretch;
+}
+
+/* =========================
+   BSR Permanent Reveal Badge
+   ========================= */
+.bsr-perm-badge {
+  color: #4fc3f7;
+  font-size: 0.75em;
+  margin-left: 0.3em;
+  vertical-align: middle;
+  opacity: 0.85;
+  cursor: default;
+}
+
+/* =========================
+   BSR Combat Tracker Toggle
+   ========================= */
+.bsr-ct-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.7;
+  font-size: inherit;
+  color: inherit;
+}
+.bsr-ct-toggle:hover {
+  opacity: 1;
+  color: #4fc3f7;
+}
