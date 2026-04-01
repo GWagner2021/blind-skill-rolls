@@ -5,6 +5,22 @@
   const MOD = "blind-skill-rolls";
   const FILE_NAME = "fvtt-bsr-troubleshooter.json";
 
+  const KNOWN_COMPAT_MODULES = Object.freeze([
+    "blind-skill-rolls",
+    "lib-wrapper",
+    "midi-qol",
+    "dice-so-nice",
+    "combat-tracker-dock"
+  ]);
+
+  const MODULE_ALIASES = Object.freeze(new Map([
+    ["blind-skill-rolls", ["blind skill rolls", "bsr"]],
+    ["midi-qol", ["midi qol", "midiqol"]],
+    ["dice-so-nice", ["dicesonice"]],
+    ["lib-wrapper", ["libwrapper"]],
+    ["combat-tracker-dock", []]
+  ]));
+
   // -----------------------------
   // Debug mode (client setting)
   // -----------------------------
@@ -40,7 +56,13 @@
 
   // Logging helpers
   globalThis.dbgWarn ??= (...args) => {
-    if (bsrDebugLevel() >= BSR_DEBUG_LEVELS.warnings) console.warn(...args);
+    if (bsrDebugLevel() >= BSR_DEBUG_LEVELS.warnings) {
+      console.warn(...args);
+      try {
+        const combined = args.map(normalizeToString).join(" ");
+        pushLog({ level: "warn", message: combined, source: "bsr.debug", origin: MOD });
+      } catch {}
+    }
   };
   globalThis.dbgInfo ??= (...args) => {
     if (bsrDebugLevel() >= BSR_DEBUG_LEVELS.info) console.info(...args);
@@ -104,7 +126,7 @@
 
   const getModuleVersion = (id) => {
     const m = game.modules?.get(id);
-    return m?.version ?? m?.data?.version ?? null;
+    return m?.version ?? null;
   };
 
   const getInstalledModules = () => {
@@ -113,7 +135,7 @@
         .map((m) => ({
           id: m.id,
           title: m.title ?? m.id,
-          version: m.version ?? m.data?.version ?? null,
+          version: m.version ?? null,
           active: !!m.active,
           compatibility: safeJson(m.compatibility ?? null)
         }))
@@ -167,6 +189,15 @@
     }
   };
 
+  const getAbilityLabel = (key) => {
+    try {
+      const entry = CONFIG?.DND5E?.abilities?.[key];
+      return entry?.label ?? null;
+    } catch {
+      return null;
+    }
+  };
+
   const localizeMaybe = (s) => {
     if (!s || typeof s !== "string") return s;
     try {
@@ -185,11 +216,22 @@
     }
   };
 
+  const stripPrivateSuffix = (k) => k.replace(/_private$/, "");
+
   const displayNameForSetting = (key) => {
     const k = String(key ?? "");
     const lower = k.toLowerCase();
 
-    if (SKILL_KEYS.has(lower)) return getSkillLabel(lower) ?? k;
+    // Save keys: extract ability name from save_{ability} or save_{ability}_private
+    if (lower.startsWith("save_")) {
+      const abilityKey = stripPrivateSuffix(lower.replace(/^save_/, ""));
+      const label = getAbilityLabel(abilityKey);
+      if (label) return localizeMaybe(label);
+    }
+
+    // Skill keys: strip _private suffix to get base skill label
+    const baseSkill = stripPrivateSuffix(lower);
+    if (SKILL_KEYS.has(baseSkill)) return getSkillLabel(baseSkill) ?? baseSkill;
 
     const meta = getSettingMeta(k);
     const rawName = meta?.name ?? null;
@@ -201,31 +243,84 @@
   const groupNameForSetting = (key) => {
     const k = String(key ?? "").toLowerCase();
 
-    if (SKILL_KEYS.has(k) || k.startsWith("skill")) return "Skills";
-    if (k.startsWith("chat") || k.includes("message") || k.includes("hide")) return "Chat / Messages";
+    // Skills: split blind vs private
+    const baseSkill = stripPrivateSuffix(k);
+    if (SKILL_KEYS.has(baseSkill)) {
+      return k.endsWith("_private") ? "Skills Private" : "Skills Blind";
+    }
+    if (k.startsWith("skill")) {
+      return k.endsWith("_private") ? "Skills Private" : "Skills Blind";
+    }
+
+    // Saves: split blind vs private
+    if (k.startsWith("save_")) {
+      return k.endsWith("_private") ? "Saving Throws Private" : "Saving Throws Blind";
+    }
+
+    // Fast Forward: split GM vs Player
+    if (k.startsWith("ff")) {
+      return k.startsWith("ffplayer") ? "Fast Forward Player" : "Fast Forward GM";
+    }
+
     if (k.startsWith("death") || k.includes("deathsave")) return "Death Saves";
+
+    // Chat Display & Privacy (includes NPC masking settings)
+    if (k === "hideforeignsecrets" || k === "muteforeignsecretsounds" ||
+        k === "bsrsanitizepublicgm" || k === "bsrtrustedseedetails" ||
+        k.includes("npc") || k.includes("reveal")) {
+      return "Chat Display & Privacy";
+    }
+
+    // Other BSR Settings (debug, sync notifications, theme)
+    if (k.startsWith("debug") || k === "showsyncmessages" || k === "bsrtheme") {
+      return "Other BSR Settings";
+    }
+
     if (k.startsWith("dsn") || k.includes("dicesonice") || k.includes("ghost")) return "Dice So Nice";
-    if (k.startsWith("gm") || k.includes("privacy") || k.includes("rollmode")) return "GM Privacy";
-    if (k.startsWith("npc") || k.includes("reveal") || k.includes("name")) return "NPC / Name Reveal";
-    if (k.startsWith("debug")) return "Debug";
 
     return "Other";
   };
 
   const groupOrder = [
-    "Skills",
-    "Chat / Messages",
+    "Skills Blind",
+    "Skills Private",
+    "Saving Throws Blind",
+    "Saving Throws Private",
     "Death Saves",
+    "Fast Forward GM",
+    "Fast Forward Player",
+    "Chat Display & Privacy",
+    "Other BSR Settings",
     "Dice So Nice",
-    "GM Privacy",
-    "NPC / Name Reveal",
-    "Debug",
     "Other"
   ];
 
-  // -----------------------------
-  // MidiQOL summary
-  // -----------------------------
+  // Metadata for group header display (label + colored tag)
+  const GROUP_META = Object.freeze({
+    "Skills Blind": { label: "Skills", tag: "Blind" },
+    "Skills Private": { label: "Skills", tag: "Private" },
+    "Saving Throws Blind": { label: "Saving Throws", tag: "Blind" },
+    "Saving Throws Private": { label: "Saving Throws", tag: "Private" },
+    "Fast Forward GM": { label: "Fast Forward", tag: "GM" },
+    "Fast Forward Player": { label: "Fast Forward", tag: "Player" }
+  });
+
+  // Groups that should be displayed side-by-side
+  const PAIRED_GROUPS = Object.freeze([
+    ["Skills Blind", "Skills Private"],
+    ["Saving Throws Blind", "Saving Throws Private"],
+    ["Fast Forward GM", "Fast Forward Player"]
+  ]);
+
+  // Setting keys shown as per-column headers above each paired group
+  const PAIRED_HEADER_KEYS = Object.freeze({
+    "Skills Blind": { left: "enabled", right: "blindRollersChat" },
+    "Saving Throws Blind": { left: "savesEnabled", right: "blindRollersSaveChat" }
+  });
+  const HEADER_KEY_SET = new Set(
+    Object.values(PAIRED_HEADER_KEYS).flatMap(v => [v.left, v.right]).filter(Boolean)
+  );
+
   const getPath = (obj, path) => {
     if (!obj) return undefined;
     const parts = String(path).split(".");
@@ -303,9 +398,6 @@
     return rows;
   };
 
-  // -----------------------------
-  // BSR/Midi console log
-  // -----------------------------
   const LOG_MAX = 250;
   const logBuffer = [];
 
@@ -325,22 +417,36 @@
     }
   };
 
-  const shouldCapture = (text) => {
-    const t = String(text ?? "").toLowerCase();
-
-    if (t.includes("blind-skill-rolls") || t.includes("blind skill rolls") || t.includes("bsr")) return true;
-    if (t.includes("midi-qol") || t.includes("midi qol") || t.includes("midiqol")) return true;
-
-    return false;
+  const classifyOrigin = (filename, stack) => {
+    const sources = [filename, stack].filter(Boolean).join("\n").toLowerCase();
+    for (const id of KNOWN_COMPAT_MODULES) {
+      if (sources.includes(`modules/${id}/`)) return id;
+    }
+    return null;
   };
 
-  const pushLog = ({ level, message, stack = null, source = "console" }) => {
+  const findMentionedModule = (text) => {
+    if (!text) return null;
+    const t = String(text).toLowerCase();
+    for (const id of KNOWN_COMPAT_MODULES) {
+      if (t.includes(id)) return id;
+    }
+    for (const [id, aliases] of MODULE_ALIASES) {
+      for (const alias of aliases) {
+        if (t.includes(alias)) return id;
+      }
+    }
+    return null;
+  };
+
+  const pushLog = ({ level, message, stack = null, source = "console", origin = null }) => {
     const entry = {
       time: new Date().toISOString(),
       level,
       source,
       message,
-      stack
+      stack,
+      origin
     };
     logBuffer.unshift(entry);
     if (logBuffer.length > LOG_MAX) logBuffer.length = LOG_MAX;
@@ -350,40 +456,20 @@
   if (!globalThis[WRAP_FLAG]) {
     globalThis[WRAP_FLAG] = true;
 
-    const wrap = (method, level) => {
-      const orig = console[method];
-      if (typeof orig !== "function") return;
-
-      console[method] = function (...args) {
-        try {
-          const combined = args.map(normalizeToString).join(" ");
-          if (shouldCapture(combined)) {
-            let stack = null;
-            try {
-              stack = new Error().stack ?? null;
-            } catch {}
-            pushLog({ level, message: combined, stack, source: `console.${method}` });
-          }
-        } catch {}
-
-        return orig.apply(this, args);
-      };
-    };
-
-    // ONLY warn/error
-    wrap("error", "error");
-    wrap("warn", "warn");
-
     window.addEventListener("error", (ev) => {
       try {
         const err = ev?.error;
         const msg = err?.message ?? ev?.message ?? "Unknown error";
-        const where = ev?.filename ? `${ev.filename}:${ev.lineno}:${ev.colno}` : "";
+        const filename = ev?.filename ?? "";
+        const where = filename ? `${filename}:${ev.lineno}:${ev.colno}` : "";
         const combined = `${msg}${where ? ` (${where})` : ""}`;
         const stack = err?.stack ?? null;
 
-        if (shouldCapture(combined) || shouldCapture(stack)) {
-          pushLog({ level: "error", message: combined, stack, source: "window.error" });
+        const origin = classifyOrigin(filename, stack)
+          ?? findMentionedModule(combined)
+          ?? findMentionedModule(stack);
+        if (origin) {
+          pushLog({ level: "error", message: combined, stack, source: "window.error", origin });
         }
       } catch {}
     });
@@ -394,19 +480,21 @@
         const msg = reason?.message ?? String(reason ?? "Unhandled promise rejection");
         const stack = reason?.stack ?? null;
 
-        if (shouldCapture(msg) || shouldCapture(stack)) {
+        const origin = classifyOrigin(null, stack)
+          ?? findMentionedModule(msg)
+          ?? findMentionedModule(stack);
+        if (origin) {
           pushLog({
             level: "error",
             message: msg,
             stack,
-            source: "window.unhandledrejection"
+            source: "window.unhandledrejection",
+            origin
           });
         }
       } catch {}
     });
 
-    // Intentionally do NOT patch Hooks.onError here.
-    // Wrapping it can recurse with libWrapper during startup/world load.
   }
 
   const clearLog = () => {
@@ -423,7 +511,7 @@
     const moduleInfo = {
       id: MOD,
       title: self?.title ?? MOD,
-      version: self?.version ?? self?.data?.version ?? null
+      version: self?.version ?? null
     };
 
     const installedModules = getInstalledModules();
@@ -444,7 +532,7 @@
       generatedAt: now,
       module: moduleInfo,
       core: {
-        foundryVersion: game.version ?? game.data?.version ?? null,
+        foundryVersion: game.version ?? null,
         build: safeJson(game.build ?? null),
         release: safeJson(game.release ?? null)
       },
@@ -483,7 +571,7 @@
       id: "bsr-troubleshooter",
       classes: ["bsr-ts"],
       window: { title: "Troubleshooter", resizable: true },
-      position: { width: 1100, height: 750 }
+      position: { width: 960, height: 640 }
     };
 
     static PARTS = {
@@ -515,7 +603,12 @@
         });
 
       const grouped = {};
+      const headerItems = {};
       for (const s of report.bsrSettings ?? []) {
+        if (HEADER_KEY_SET.has(s.key)) {
+          headerItems[s.key] = { name: displayNameForSetting(s.key), value: stringifyVal(s.value) };
+          continue;
+        }
         const group = groupNameForSetting(s.key);
         (grouped[group] ??= []).push({
           name: displayNameForSetting(s.key),
@@ -535,6 +628,46 @@
           items: items.sort((x, y) => x.name.localeCompare(y.name))
         }));
 
+      // Build paired/single layout for side-by-side rendering
+      const pairedLeftSet = new Set(PAIRED_GROUPS.map(p => p[0]));
+      const pairedRightSet = new Set(PAIRED_GROUPS.map(p => p[1]));
+      const pairMap = Object.fromEntries(PAIRED_GROUPS);
+      const processed = new Set();
+
+      const settingsLayout = [];
+      for (const g of bsrSettingsGroups) {
+        if (processed.has(g.group)) continue;
+        processed.add(g.group);
+
+        const meta = GROUP_META[g.group] ?? { label: g.group, tag: null };
+
+        if (pairedLeftSet.has(g.group)) {
+          const rightName = pairMap[g.group];
+          const right = bsrSettingsGroups.find(x => x.group === rightName);
+          processed.add(rightName);
+
+          const rightMeta = GROUP_META[rightName] ?? { label: rightName, tag: null };
+
+          // Collect per-column header settings for this pair
+          const hdrDef = PAIRED_HEADER_KEYS[g.group];
+          const leftHeader = hdrDef ? headerItems[hdrDef.left] ?? null : null;
+          const rightHeader = hdrDef ? headerItems[hdrDef.right] ?? null : null;
+
+          settingsLayout.push({
+            paired: true,
+            left: { headerItem: leftHeader, label: meta.label, tag: meta.tag, items: g.items },
+            right: right
+              ? { headerItem: rightHeader, label: rightMeta.label, tag: rightMeta.tag, items: right.items }
+              : null
+          });
+        } else if (!pairedRightSet.has(g.group)) {
+          settingsLayout.push({
+            paired: false,
+            group: { label: meta.label, tag: meta.tag, items: g.items }
+          });
+        }
+      }
+
       const summaryRows = [
         { label: "Foundry Version", value: report.core?.foundryVersion ?? "" },
         { label: "System", value: `${report.system?.id ?? ""} ${report.system?.version ?? ""}`.trim() },
@@ -552,13 +685,14 @@
         level: e.level,
         source: e.source,
         message: e.message,
-        stack: e.stack
+        stack: e.stack,
+        origin: e.origin ?? "unknown"
       }));
 
       return {
         activeTab: this.#activeTab,
         summaryRows,
-        bsrSettingsGroups,
+        settingsLayout,
         midiSettingsRows,
         problemsRows,
         allModulesRows,
@@ -661,6 +795,9 @@
     open: () => BsrTroubleshooterApp.open(),
     export: () => downloadJson(buildReportObject()),
     clearLog,
-    buildReportObject
+    buildReportObject,
+    capture: ({ level = "warn", message = "", source = "api", origin = null } = {}) => {
+      pushLog({ level, message: String(message), source, origin });
+    }
   };
 })();
