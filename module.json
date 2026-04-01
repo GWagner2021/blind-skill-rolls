@@ -1,11 +1,11 @@
 {
   "id": "blind-skill-rolls",
   "title": "Blind Skill Rolls",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "<p>Automatically sets selected DnD5e skill checks to Blind GM Roll. </p><p>Setzt ausgewählte DnD5e-Skillwürfe automatisch als Blind GM Roll.</p>",
   "compatibility": {
-    "minimum": "13",
-    "verified": "13"
+    "minimum": "14",
+    "verified": "14.359"
   },
   "authors": [
     {
@@ -14,50 +14,53 @@
       "flags": {}
     }
   ],
-  "flags": { "canUpload": false },
+  "flags": {
+    "canUpload": false
+  },
   "relationships": {
     "systems": [
-      { "id": "dnd5e", "type": "system" }
-    ],
-    "requires": [
-    {
-      "id": "lib-wrapper",
-      "type": "module",
-      "compatibility": { "minimum": "1.12.6.0", "verified": "1.13.4.0" }
-    }
-  ]
+      {
+        "id": "dnd5e",
+        "type": "system",
+        "compatibility": {
+          "minimum": "5.3.0",
+          "verified": "5.3.0"
+        }
+      }
+    ]
   },
   "languages": [
-    { "lang": "en", "name": "English",  "path": "lang/en.json", "flags": {} },
-    { "lang": "de", "name": "Deutsch",  "path": "lang/de.json", "flags": {} },
+    { "lang": "en", "name": "English", "path": "lang/en.json", "flags": {} },
+    { "lang": "de", "name": "Deutsch", "path": "lang/de.json", "flags": {} },
     { "lang": "fr", "name": "Français", "path": "lang/fr.json", "flags": {} },
-    { "lang": "es", "name": "Español",  "path": "lang/es.json", "flags": {} },
+    { "lang": "es", "name": "Español", "path": "lang/es.json", "flags": {} },
     { "lang": "it", "name": "Italiano", "path": "lang/it.json", "flags": {} },
-    { "lang": "ru", "name": "Russian",  "path": "lang/ru.json", "flags": {} },
-    { "lang": "pl", "name": "Polski",   "path": "lang/pl.json", "flags": {} }
+    { "lang": "ru", "name": "Russian", "path": "lang/ru.json", "flags": {} },
+    { "lang": "pl", "name": "Polski", "path": "lang/pl.json", "flags": {} }
   ],
-"scripts": [
-  "scripts/bsr-troubleshooter.js",
-  "scripts/settings/bsr-settings.js",
-  "scripts/settings/bsr-chat-settings.js",
-  "scripts/settings/bsr-skills-settings.js",
-  "scripts/settings/bsr-death-settings.js",
-  "scripts/settings/settings-dsn.js",
-
-  "scripts/bsr-chat-hide.js",
-  "scripts/bsr-skills.js",
-  "scripts/bsr-death-saves.js",
-  "scripts/bsr-gm-privacy.js",
-  "scripts/bsr-npc-reveal.js"
-],
-"styles": ["style.css"],
-"socket": true,
+  "scripts": [
+    "scripts/bsr-troubleshooter.js",
+    "scripts/settings/bsr-settings.js",
+    "scripts/settings/bsr-chat-settings.js",
+    "scripts/settings/bsr-skills-settings.js",
+    "scripts/settings/bsr-death-settings.js",
+    "scripts/settings/settings-dsn.js",
+    "scripts/settings/bsr-fast-forward-settings.js",
+    "scripts/bsr-chat-hide.js",
+    "scripts/bsr-skills.js",
+    "scripts/bsr-saves.js",
+    "scripts/bsr-fast-forward.js",
+    "scripts/bsr-death-saves.js",
+    "scripts/bsr-gm-privacy.js",
+    "scripts/bsr-npc-reveal.js"
+  ],
+  "styles": ["style.css"],
+  "socket": true,
   "url": "https://github.com/GWagner2021/blind-skill-rolls",
   "bugs": "https://github.com/GWagner2021/blind-skill-rolls/issues",
   "readme": "https://github.com/GWagner2021/blind-skill-rolls#readme",
   "license": "https://github.com/GWagner2021/blind-skill-rolls/blob/main/LICENSE",
   "changelog": "https://github.com/GWagner2021/blind-skill-rolls/blob/main/CHANGELOG.md",
   "manifest": "https://github.com/GWagner2021/blind-skill-rolls/releases/latest/download/module.json",
-  "download": "https://github.com/GWagner2021/blind-skill-rolls/releases/download/v1.2.2/blind-skill-rolls.zip"
+  "download": "https://github.com/GWagner2021/blind-skill-rolls/releases/download/v1.3.0/blind-skill-rolls.zip"
 }
-
