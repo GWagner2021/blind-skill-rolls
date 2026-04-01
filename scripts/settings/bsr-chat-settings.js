@@ -252,10 +252,10 @@
     globalThis.dbgInfo?.("BSR | Settings registered: Chat Privacy, GM Roll Privacy, NPC Masking");
   });
 
-  function injectChatDisplayControls(_app, jqOrHtml) {
+  function injectChatDisplayControls(_app, html) {
     try {
-      const root = (jqOrHtml?.[0] ?? jqOrHtml);
-      if (!(root instanceof HTMLElement)) return;
+      if (!(html instanceof HTMLElement)) return;
+      const root = html;
 
       const form = root.querySelector("form") ?? root.querySelector(".window-content form") ?? root;
       if (!form) return;

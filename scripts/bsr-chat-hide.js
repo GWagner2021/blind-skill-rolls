@@ -119,8 +119,7 @@
   function isAddressedToMe(m){
     const me = meId(); if (!me) return false;
     if (!isSecret(m)) return true;
-    // v13+ compatible: author.id → author → user (deprecated) → userId (legacy)
-    const author = m?.author?.id ?? m?.author ?? m?.user ?? m?.userId;
+    const author = m?.author?.id ?? m?.author;
     if (String(author)===String(me)) return true;
     return whisperIds(m).map(String).includes(String(me));
   }
@@ -146,14 +145,15 @@
 
   // ----- DOM sweep/observer -----
   const getSidebarRoot = () => {
-    const el = ui?.chat?.element; const root = (el && el[0]) ? el[0] : null;
-    return root?.querySelector?.("ol.chat-log") ?? root?.querySelector?.(".chat-log") ?? root ?? null;
+    const el = ui?.chat?.element;
+    if (!(el instanceof HTMLElement)) return null;
+    return el.querySelector("ol.chat-log, .chat-log") ?? el;
   };
   function popoutLogs(){
     const out=[]; for (const w of Object.values(ui.windows ?? {})) {
       if (!w || w.constructor?.name!=="ChatPopout") continue;
-      const cont = w.element?.find?.(".window-content")?.[0] ?? null;
-      const log  = cont?.querySelector?.("ol.chat-log") ?? cont?.querySelector?.(".chat-log") ?? cont;
+      const cont = w.element instanceof HTMLElement ? w.element.querySelector(".window-content") : null;
+      const log  = cont?.querySelector?.("ol.chat-log, .chat-log") ?? cont;
       if (log) out.push(log);
     } return out;
   }
@@ -199,7 +199,8 @@
   const popoutObservers=new WeakMap();
   Hooks.on("renderChatPopout", (_app, html) => {
     if (game.user.isGM) return;
-    const root=(html?.[0] ?? html); if (!root) return;
+    const root = html instanceof HTMLElement ? html : null;
+    if (!root) return;
     const logEl=root.querySelector?.("ol.chat-log") ?? root.querySelector?.(".chat-log") ?? root;
     const prev = popoutObservers.get(logEl); if (prev) try { prev.disconnect(); } catch {}
     const obs=new MutationObserver((muts)=>{
@@ -222,7 +223,7 @@
 
   Hooks.on("closeChatPopout", (_app, html) => {
     try {
-      const root=(html?.[0] ?? html);
+      const root = html instanceof HTMLElement ? html : null;
       const logEl=root?.querySelector?.("ol.chat-log") ?? root?.querySelector?.(".chat-log") ?? root;
       const obs=popoutObservers.get(logEl); if (obs) obs.disconnect(); popoutObservers.delete(logEl);
     } catch {}
@@ -379,16 +380,17 @@
   Hooks.on("preCreateChatMessage", (_doc, data)=>{
     try{
       if (game.user.isGM || !OPT_MUTE()) return;
-      const secret=!!data?.blind || (Array.isArray(data?.whisper) && data.whisper.length>0);
+      const whisper = _doc?.whisper ?? data?.whisper;
+      const blind = _doc?.blind ?? data?.blind;
+      const secret=!!blind || (Array.isArray(whisper) && whisper.length>0);
       if (!secret) return;
       const me=meId();
-      const author=String(data?.author?.id ?? data?.author ?? data?.user ?? data?.userId ?? "");
-      const wh = Array.isArray(data?.whisper) ? data.whisper.map(String) : [];
+      const author=String(_doc?.author?.id ?? data?.author?.id ?? data?.author ?? "");
+      const wh = Array.isArray(whisper) ? whisper.map(String) : [];
       const toMe = (author===String(me)) || wh.includes(String(me));
       if (!toMe) openMute(3500);
     } catch {}
   });
-  //Hooks.on("diceSoNiceRollStart", ()=>{ try{ if (!game.user.isGM && OPT_MUTE()) openMute(3500); } catch {} });
   Hooks.on("createChatMessage", (doc)=>{ try{
     if (game.user.isGM || !OPT_MUTE()) return;
     if (doc?.blind || (Array.isArray(doc?.whisper) && doc.whisper.length>0)){
@@ -400,12 +402,6 @@
     ensureGlobalStyle();
     applyCssGuard();
     observeSidebar();
-
-    const body = document.body;
-    if (body) {
-      const bodyObserver = new MutationObserver(() => { });
-      bodyObserver.observe(body, { childList:true, subtree:true });
-    }
 
     installAudioPatches();
 
@@ -428,10 +424,27 @@
       });
     }
 
+    function isSavingThrowMessage(message) {
+      try {
+        const d5 = message?.flags?.dnd5e ?? {};
+        const rollType = d5?.roll?.type ?? d5?.type ?? d5?.rollType ?? null;
+        const hasAbility = !!(d5?.roll?.abilityId || d5?.abilityId);
+        const hasSkill = !!(d5?.roll?.skillId || d5?.skillId || d5?.roll?.skill || d5?.skill);
+        const isDeath = rollType === "death" || message?.flavor === "Death Saving Throw";
+        if (isDeath) return false;
+        if (hasSkill) return false;
+        return rollType === "save" || rollType === "ability" || hasAbility;
+      } catch { return false; }
+    }
+
     Hooks.on("renderChatMessageHTML", (message, html, data) => {
 
         if(!game.user.isGM){
-          if(message.blind  && game.settings.get(MOD, "blindRollersChat") && message.flavor != "Death Saving Throw")  {html.classList.add("hidden_msg");}
+          const revealedToRoller = message.getFlag?.(MOD, "revealedToRoller");
+          const isRoller = message.author?.id === game.user?.id;
+          const isSave = isSavingThrowMessage(message);
+          if(message.blind && isSave && game.settings.get(MOD, "blindRollersSaveChat") && !(revealedToRoller && isRoller)) {html.classList.add("hidden_msg");}
+          if(message.blind && !isSave && game.settings.get(MOD, "blindRollersChat") && message.flavor != "Death Saving Throw" && !(revealedToRoller && isRoller))  {html.classList.add("hidden_msg");}
           if(message.blind  && game.settings.get(MOD, "blindRollersDeathSaveChat") && message.flavor == "Death Saving Throw") {html.classList.add("hidden_msg");}
           removeBlind();
 

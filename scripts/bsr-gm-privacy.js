@@ -28,8 +28,8 @@
 
   Hooks.on("renderChatMessageHTML", (message, html) => {
     try {
-      const el = html?.[0] ?? html;
-      if (!(el instanceof HTMLElement)) return;
+      if (!(html instanceof HTMLElement)) return;
+      const el = html;
 
       const authorIsGM = isGMUser(message.author);
       const isBlind = el.classList.contains("blind");

@@ -28,7 +28,7 @@
     }
 
     const gmId    = game.users.activeGM?.id;
-    const author  = userId || msg.user || game.user?.id;
+    const author  = userId || msg.author?.id || game.user?.id;
 
     if (mode === "privatroll") {
       const whisper = [gmId, author].filter(Boolean);

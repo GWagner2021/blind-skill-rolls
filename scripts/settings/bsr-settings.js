@@ -9,8 +9,11 @@
     "scripts/settings/bsr-skills-settings.js",
     "scripts/settings/bsr-death-settings.js",
     "scripts/settings/settings-dsn.js",
+    "scripts/settings/bsr-fast-forward-settings.js",
     "scripts/bsr-chat-hide.js",
     "scripts/bsr-skills.js",
+    "scripts/bsr-saves.js",
+    "scripts/bsr-fast-forward.js",
     "scripts/bsr-death-saves.js",
     "scripts/bsr-gm-privacy.js",
     "scripts/bsr-npc-reveal.js"
@@ -101,7 +104,7 @@
         globalThis.dbgInfo?.(`BSR | theme changed to: ${value}`);
       }
     });
-    globalThis.dbgInfo?.("BSR | theme + roll gateway settings registered");
+    globalThis.dbgInfo?.("BSR | theme setting registered");
   });
 
   // ---- Theme helpers ----
@@ -186,31 +189,6 @@
     `;
   };
 
-  // ---- Roll gateway helpers ----
-  const _normalizeGateway = (v) => {
-    const m = String(v ?? "auto").toLowerCase();
-    return (m === "auto" || m === "v2" || m === "legacy") ? m : "auto";
-  };
-
-  const _resolveGatewayMode = () => {
-    const pref = (() => {
-      try { return _normalizeGateway(game.settings.get(MOD, "rollGatewayMode")); }
-      catch { return "auto"; }
-    })();
-
-    if (pref !== "auto") return pref;
-
-    // Auto: prefer V2 on Foundry v13+
-    const gen = Number(game.release?.generation ?? 0);
-    const hasV2 = gen >= 13 || !!foundry?.applications?.api?.ApplicationV2;
-    return hasV2 ? "v2" : "legacy";
-  };
-
-  globalThis.BSR.getRollGatewayMode = () => {
-    try { return _resolveGatewayMode(); } catch { return "v2"; }
-  };
-  globalThis.BSR.isRollGatewayV2 = () => globalThis.BSR.getRollGatewayMode() === "v2";
-  globalThis.BSR.isRollGatewayLegacy = () => globalThis.BSR.getRollGatewayMode() === "legacy";
 })();
 
 window.BSR_102.load_count += 1;
