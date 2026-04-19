@@ -1,5 +1,31 @@
-## [Unreleased]
-_TBD_
+## [1.4.0] - 2026-04-18
+
+This release improves MidiQOL and Dice So Nice compatibility, migrates the codebase to TypeScript, adds custom chat card colors, and fixes several dice visibility and timing issues.
+
+### Added
+- **Custom Chat Card Colors** — players and GMs can now customize the background color (including transparency) of blind and private roll chat cards.
+- **TypeScript migration** — the entire codebase has been converted to TypeScript for improved maintainability and type safety. No behavioral changes for users.
+
+### Changed
+- **Dice So Nice integration reworked** — the roll mode is now preserved reliably between the roll and the dice animation, even when other modules process the message in between. Ghost dice markers survive across network serialization so remote players see the correct animation.
+- **Pending roll tracking improved** — pending skill and save rolls are now tracked per actor, preventing stale state from leaking between different characters or roll types. A safety limit prevents unbounded memory growth.
+- **Roll config dialog guard improved** — the guard now clears state per actor instead of globally and handles chained rolls (e.g. ability checks triggered by skill rolls) without interfering with the primary roll.
+- **Chat visibility enforcement strengthened** — visibility is now applied via inline styles to guarantee correct display regardless of other modules or themes overriding CSS.
+- Updated FoundryVTT compatibility verified to **14.360**.
+- Updated dnd5e compatibility to **5.3.1**.
+
+### Fixed
+- Fixed Dice So Nice showing public dice instead of ghost dice for blind/private rolls due to a timing issue where the roll mode was cleared before the dice animation ran.
+- Fixed double dice animation appearing when MidiQOL is active, where a second unhandled animation would show public dice to the roller.
+- Fixed ghost dice markers not reaching remote clients, causing other players to see incorrect dice animations.
+- Fixed the roller seeing real dice instead of ghost dice on blind rolls when MidiQOL triggers an additional dice animation.
+- Fixed death save ghost dice not appearing for other players when MidiQOL handles the roll.
+- Fixed hidden NPC token rolls leaking ghost dice to players when Dice So Nice's "show ghost dice" option was enabled.
+- Fixed private roll messages becoming invisible to players when MidiQOL overrides the whisper list after BSR has already set it.
+- Fixed "Reveal to Roller" not showing dice content to the original roller after the GM reveals a blind message.
+- Fixed a brief visibility flash where Foundry's own rendering could temporarily override BSR's display settings before the chat card settled.
+- Fixed blind roll dice sounds leaking to players in edge cases where the muting was not enforced strongly enough.
+- Fixed rare cases where chat messages could report incorrect visibility when the standard visibility override was blocked by another module.
 
 ## [1.3.0] - 2026-04-02
 

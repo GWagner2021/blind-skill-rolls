@@ -1,0 +1,48 @@
+<form class="bsr-form">
+  <div class="bsr-card">
+    <div class="bsr-card__header">
+      <span class="bsr-card__title"><i class="fa-solid fa-comments"></i> {{labels.chatDisplay}}</span>
+    </div>
+    <div class="bsr-card__body">
+      <label class="bsr-form-check">
+        <input type="checkbox" name="hide" {{#if hide}}checked{{/if}}>
+        <span>{{labels.hideForeignName}}</span>
+      </label>
+      <p class="bsr-hint">{{labels.hideForeignHint}}</p>
+      <label class="bsr-form-check">
+        <input type="checkbox" name="mute" {{#if mute}}checked{{/if}}>
+        <span>{{labels.muteForeignName}}</span>
+      </label>
+      <p class="bsr-hint">{{labels.muteForeignHint}}</p>
+
+      <div class="bsr-section-label"><i class="fa-solid fa-user-shield"></i> {{labels.gmRolls}}</div>
+      <label class="bsr-form-check">
+        <input type="checkbox" name="sanitize" {{#if sanitize}}checked{{/if}}>
+        <span>{{labels.sanitizeName}}</span>
+      </label>
+      <p class="bsr-hint">{{labels.sanitizeHint}}</p>
+      <label class="bsr-form-check">
+        <input type="checkbox" name="trusted" {{#if trusted}}checked{{/if}}>
+        <span>{{labels.trustedName}}</span>
+      </label>
+      <p class="bsr-hint">{{labels.trustedHint}}</p>
+
+      <div class="bsr-section-label"><i class="fa-solid fa-mask"></i> {{labels.npcMasking}}</div>
+      <label class="bsr-form-check">
+        <input type="checkbox" name="maskDef" {{#if maskDef}}checked{{/if}}>
+        <span>{{labels.npcMaskName}}</span>
+      </label>
+      <p class="bsr-hint">{{labels.npcMaskHint}}</p>
+      <div class="bsr-form-group">
+        <label class="bsr-form-group__label">{{labels.npcReplName}}</label>
+        <input type="text" name="repl" value="{{repl}}" class="bsr-form-group__control">
+      </div>
+      <p class="bsr-hint">{{labels.npcReplHint}}</p>
+    </div>
+  </div>
+
+  <footer class="bsr-footer">
+    <button type="button" class="bsr-btn" data-action="cancel">{{labels.cancel}}</button>
+    <button type="submit" class="bsr-btn bsr-btn-primary" data-action="save">{{labels.save}}</button>
+  </footer>
+</form>

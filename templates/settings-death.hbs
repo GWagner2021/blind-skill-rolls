@@ -1,0 +1,30 @@
+<form class="bsr-form">
+  <div class="bsr-card">
+    <div class="bsr-card__header">
+      <span class="bsr-card__title"><i class="fa-solid fa-heart-pulse"></i> {{labels.deathSaves}}</span>
+    </div>
+    <div class="bsr-card__body">
+      <p class="bsr-hint">{{labels.modeHint}}</p>
+      <div class="bsr-form-group">
+        <label class="bsr-form-group__label">{{labels.modeName}}</label>
+        <select name="dsMode" class="bsr-form-group__control">
+          <option value="public" {{#if modePublic}}selected{{/if}}>{{labels.modePublic}}</option>
+          <option value="privatroll" {{#if modePrivate}}selected{{/if}}>{{labels.modePrivate}}</option>
+          <option value="blindroll" {{#if modeBlind}}selected{{/if}}>{{labels.modeBlind}}</option>
+        </select>
+      </div>
+
+      <div class="bsr-section-label"><i class="fa-solid fa-eye-slash"></i> {{labels.blindRollersChatLegend}}</div>
+      <label class="bsr-form-check">
+        <input type="checkbox" name="blindRollersDeathSaveChat" {{#if blindRollersDeathSaveChat}}checked{{/if}}>
+        <span>{{labels.blindRollersChatName}}</span>
+      </label>
+      <p class="bsr-hint">{{labels.blindRollersChatHint}}</p>
+    </div>
+  </div>
+
+  <footer class="bsr-footer">
+    <button type="button" class="bsr-btn" data-action="cancel">{{labels.cancel}}</button>
+    <button type="submit" class="bsr-btn bsr-btn-primary" data-action="save">{{labels.save}}</button>
+  </footer>
+</form>

@@ -1,82 +1,109 @@
-<div class="bsr-ts__window">
+<div class="bsr-ts">
   <nav class="bsr-ts__tabs">
-    <button type="button" class="bsr-ts__tab {{#if (eq activeTab 'summary')}}is-active{{/if}}" data-tab="summary">Summary</button>
-    <button type="button" class="bsr-ts__tab {{#if (eq activeTab 'problems')}}is-active{{/if}}" data-tab="problems">Problems</button>
-    <button type="button" class="bsr-ts__tab {{#if (eq activeTab 'all')}}is-active{{/if}}" data-tab="all">All Modules</button>
+    <button type="button" class="bsr-btn bsr-btn-sm bsr-ts__tab {{#if (eq activeTab 'summary')}}bsr-ts__tab--active{{/if}}" data-tab="summary"><i class="fa-solid fa-clipboard-list"></i> {{labels.tabSummary}}</button>
+    <button type="button" class="bsr-btn bsr-btn-sm bsr-ts__tab {{#if (eq activeTab 'problems')}}bsr-ts__tab--active{{/if}}" data-tab="problems"><i class="fa-solid fa-triangle-exclamation"></i> {{labels.tabProblems}}</button>
+    <button type="button" class="bsr-btn bsr-btn-sm bsr-ts__tab {{#if (eq activeTab 'all')}}bsr-ts__tab--active{{/if}}" data-tab="all"><i class="fa-solid fa-cubes"></i> {{labels.tabAllModules}}</button>
   </nav>
 
   <section class="bsr-ts__body">
 
     {{#if (eq activeTab 'summary')}}
-      <div class="bsr-ts__infoStrip">
-        {{#each summaryRows}}
-          <div class="bsr-ts__infoItem">
-            <span class="bsr-ts__infoLabel">{{label}}</span>
-            <span class="bsr-ts__infoValue">{{value}}</span>
-          </div>
-        {{/each}}
+      {{!-- Info strip --}}
+      <div class="bsr-card">
+        <div class="bsr-card__header">
+          <span class="bsr-card__title"><i class="fa-solid fa-info-circle"></i> {{labels.sectionEnv}}</span>
+        </div>
+        <div class="bsr-card__body bsr-ts__infoStrip">
+          {{#each summaryRows}}
+            <div class="bsr-ts__infoItem">
+              <span class="bsr-ts__infoLabel">{{label}}</span>
+              <span class="bsr-ts__infoValue">{{value}}</span>
+            </div>
+          {{/each}}
+        </div>
       </div>
 
-      <div class="bsr-ts__card">
-        <h2 class="bsr-ts__sectionTitle">BSR Settings</h2>
+      {{!-- BSR Settings --}}
+      <div class="bsr-card">
+        <div class="bsr-card__header">
+          <span class="bsr-card__title"><i class="fa-solid fa-sliders"></i> {{labels.sectionSettings}}</span>
+        </div>
+        <div class="bsr-card__body bsr-ts__settingsBody">
+          {{#each settingsLayout}}
+            {{#if paired}}
+              <div class="bsr-ts__pairRow">
+                {{#if left}}
+                  <div class="bsr-ts__group">
+                    {{#if left.headerItem}}
+                      <div class="bsr-ts__colHeader">
+                        <span class="bsr-ts__colHeaderName">{{left.headerItem.name}}</span>
+                        <span class="bsr-ts__colHeaderValue">{{left.headerItem.value}}</span>
+                      </div>
+                    {{/if}}
+                    <div class="bsr-ts__groupHeader {{#if left.headerItem}}bsr-ts__groupHeader--below{{/if}}">{{left.label}} {{#if left.tag}}<span class="bsr-ts__groupTag">{{left.tag}}</span>{{/if}}</div>
+                    <table class="bsr-ts__table bsr-ts__table--fixed">
+                      <thead><tr><th>{{@root.labels.thSetting}}</th><th>{{@root.labels.thValue}}</th></tr></thead>
+                      <tbody>
+                        {{#each left.items}}
+                          <tr>
+                            <td class="bsr-ts__settingName">{{name}}</td>
+                            <td class="bsr-ts__settingValue">{{value}}</td>
+                          </tr>
+                        {{/each}}
+                      </tbody>
+                    </table>
+                  </div>
+                {{/if}}
+                {{#if right}}
+                  <div class="bsr-ts__group">
+                    {{#if right.headerItem}}
+                      <div class="bsr-ts__colHeader">
+                        <span class="bsr-ts__colHeaderName">{{right.headerItem.name}}</span>
+                        <span class="bsr-ts__colHeaderValue">{{right.headerItem.value}}</span>
+                      </div>
+                    {{/if}}
+                    <div class="bsr-ts__groupHeader {{#if right.headerItem}}bsr-ts__groupHeader--below{{/if}}">{{right.label}} {{#if right.tag}}<span class="bsr-ts__groupTag">{{right.tag}}</span>{{/if}}</div>
+                    <table class="bsr-ts__table bsr-ts__table--fixed">
+                      <thead><tr><th>{{@root.labels.thSetting}}</th><th>{{@root.labels.thValue}}</th></tr></thead>
+                      <tbody>
+                        {{#each right.items}}
+                          <tr>
+                            <td class="bsr-ts__settingName">{{name}}</td>
+                            <td class="bsr-ts__settingValue">{{value}}</td>
+                          </tr>
+                        {{/each}}
+                      </tbody>
+                    </table>
+                  </div>
+                {{/if}}
+              </div>
+            {{else}}
+              <div class="bsr-ts__group">
+                <div class="bsr-ts__groupHeader">{{group.label}} {{#if group.tag}}<span class="bsr-ts__groupTag">{{group.tag}}</span>{{/if}}</div>
+                <table class="bsr-ts__table bsr-ts__table--fixed">
+                  <thead><tr><th>{{@root.labels.thSetting}}</th><th>{{@root.labels.thValue}}</th></tr></thead>
+                  <tbody>
+                    {{#each group.items}}
+                      <tr>
+                        <td class="bsr-ts__settingName">{{name}}</td>
+                        <td class="bsr-ts__settingValue">{{value}}</td>
+                      </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            {{/if}}
+          {{/each}}
 
-        {{#each settingsLayout}}
-          {{#if paired}}
-            <div class="bsr-ts__pairRow">
-              {{#if left}}
-                <div class="bsr-ts__group">
-                  {{#if left.headerItem}}
-                    <div class="bsr-ts__colHeader">
-                      <span class="bsr-ts__colHeaderName">{{left.headerItem.name}}</span>
-                      <span class="bsr-ts__colHeaderValue">{{left.headerItem.value}}</span>
-                    </div>
-                  {{/if}}
-                  <div class="bsr-ts__groupHeader {{#if left.headerItem}}bsr-ts__groupHeader--below{{/if}}">{{left.label}} {{#if left.tag}}<span class="bsr-ts__groupTag">{{left.tag}}</span>{{/if}}</div>
-                  <table class="bsr-ts__table bsr-ts__table--fixed">
-                    <thead><tr><th class="bsr-ts__colSetting">Setting</th><th class="bsr-ts__colValue">Value</th></tr></thead>
-                    <tbody>
-                      {{#each left.items}}
-                        <tr>
-                          <td class="bsr-ts__settingName">{{name}}</td>
-                          <td class="bsr-ts__settingValue">{{value}}</td>
-                        </tr>
-                      {{/each}}
-                    </tbody>
-                  </table>
-                </div>
-              {{/if}}
-              {{#if right}}
-                <div class="bsr-ts__group">
-                  {{#if right.headerItem}}
-                    <div class="bsr-ts__colHeader">
-                      <span class="bsr-ts__colHeaderName">{{right.headerItem.name}}</span>
-                      <span class="bsr-ts__colHeaderValue">{{right.headerItem.value}}</span>
-                    </div>
-                  {{/if}}
-                  <div class="bsr-ts__groupHeader {{#if right.headerItem}}bsr-ts__groupHeader--below{{/if}}">{{right.label}} {{#if right.tag}}<span class="bsr-ts__groupTag">{{right.tag}}</span>{{/if}}</div>
-                  <table class="bsr-ts__table bsr-ts__table--fixed">
-                    <thead><tr><th class="bsr-ts__colSetting">Setting</th><th class="bsr-ts__colValue">Value</th></tr></thead>
-                    <tbody>
-                      {{#each right.items}}
-                        <tr>
-                          <td class="bsr-ts__settingName">{{name}}</td>
-                          <td class="bsr-ts__settingValue">{{value}}</td>
-                        </tr>
-                      {{/each}}
-                    </tbody>
-                  </table>
-                </div>
-              {{/if}}
-            </div>
-          {{else}}
+          {{#if midiSettingsRows.length}}
             <div class="bsr-ts__group">
-              <div class="bsr-ts__groupHeader">{{group.label}} {{#if group.tag}}<span class="bsr-ts__groupTag">{{group.tag}}</span>{{/if}}</div>
+              <div class="bsr-ts__groupHeader">{{labels.sectionMidi}}</div>
               <table class="bsr-ts__table bsr-ts__table--fixed">
-                <thead><tr><th class="bsr-ts__colSetting">Setting</th><th class="bsr-ts__colValue">Value</th></tr></thead>
+                <thead><tr><th>{{labels.thSetting}}</th><th>{{labels.thValue}}</th></tr></thead>
                 <tbody>
-                  {{#each group.items}}
+                  {{#each midiSettingsRows}}
                     <tr>
-                      <td class="bsr-ts__settingName">{{name}}</td>
+                      <td class="bsr-ts__settingName">{{label}}</td>
                       <td class="bsr-ts__settingValue">{{value}}</td>
                     </tr>
                   {{/each}}
@@ -84,110 +111,98 @@
               </table>
             </div>
           {{/if}}
-        {{/each}}
-
-        {{#if midiSettingsRows.length}}
-          <div class="bsr-ts__group">
-            <div class="bsr-ts__groupHeader">MidiQOL Settings</div>
-
-            <table class="bsr-ts__table bsr-ts__table--fixed">
-              <thead>
-                <tr>
-                  <th class="bsr-ts__colSetting">Setting</th>
-                  <th class="bsr-ts__colValue">Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                {{#each midiSettingsRows}}
-                  <tr>
-                    <td class="bsr-ts__settingName">{{label}}</td>
-                    <td class="bsr-ts__settingValue">{{value}}</td>
-                  </tr>
-                {{/each}}
-              </tbody>
-            </table>
-          </div>
-        {{/if}}
+        </div>
       </div>
     {{/if}}
 
     {{#if (eq activeTab 'problems')}}
-      <div class="bsr-ts__card">
-        <h2 class="bsr-ts__sectionTitle">BSR &amp; Compatibility Module Errors</h2>
+      <div class="bsr-card">
+        <div class="bsr-card__header">
+          <span class="bsr-card__title"><i class="fa-solid fa-triangle-exclamation"></i> {{labels.sectionErrors}}</span>
+        </div>
+        <div class="bsr-card__body">
+          <p class="bsr-hint">{{labels.hintErrorCapture}}</p>
 
-        <p class="bsr-ts__muted">
-          Captures errors from BSR and known compatibility modules
-          (lib-wrapper, midi-qol, dice-so-nice, combat-tracker-dock).
-          Reproduce the issue, then check here.
-        </p>
-
-        <table class="bsr-ts__table">
-          <thead>
-            <tr>
-              <th style="width:150px;">Time</th>
-              <th style="width:70px;">Level</th>
-              <th style="width:120px;">Origin</th>
-              <th style="width:130px;">Source</th>
-              <th>Message</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#each problemsRows}}
+          <table class="bsr-ts__table">
+            <thead>
               <tr>
-                <td class="bsr-ts__mono">{{time}}</td>
-                <td class="bsr-ts__mono">{{level}}</td>
-                <td class="bsr-ts__mono">{{origin}}</td>
-                <td class="bsr-ts__mono">{{source}}</td>
-                <td class="bsr-ts__mono">{{message}}</td>
+                <th class="bsr-ts__col--time">{{labels.thTime}}</th>
+                <th class="bsr-ts__col--level">{{labels.thLevel}}</th>
+                <th class="bsr-ts__col--origin">{{labels.thOrigin}}</th>
+                <th class="bsr-ts__col--source">{{labels.thSource}}</th>
+                <th>{{labels.thMessage}}</th>
               </tr>
-            {{/each}}
+            </thead>
+            <tbody>
+              {{#each problemsRows}}
+                <tr title="{{inclusionReason}}">
+                  <td class="bsr-ts__mono">{{time}}</td>
+                  <td class="bsr-ts__mono">{{level}}</td>
+                  <td class="bsr-ts__mono">{{origin}}</td>
+                  <td class="bsr-ts__mono">{{source}}</td>
+                  <td class="bsr-ts__mono">{{message}}</td>
+                </tr>
+              {{/each}}
 
-            {{#unless problemsRows.length}}
-              <tr>
-                <td colspan="5" class="bsr-ts__muted">No errors captured yet.</td>
-              </tr>
-            {{/unless}}
-          </tbody>
-        </table>
+              {{#unless problemsRows.length}}
+                <tr>
+                  <td colspan="5" class="bsr-hint">{{@root.labels.hintNoErrors}}</td>
+                </tr>
+              {{/unless}}
+            </tbody>
+          </table>
 
-        <p class="bsr-ts__muted">Use "Export Data" to include captured logs in the JSON report.</p>
+          <p class="bsr-hint">{{labels.hintExportNote}}</p>
+        </div>
       </div>
     {{/if}}
 
     {{#if (eq activeTab 'all')}}
-      <div class="bsr-ts__card">
-        <h2 class="bsr-ts__sectionTitle">All Installed Modules</h2>
-        <table class="bsr-ts__table">
-          <thead>
-            <tr>
-              <th>Module ID</th>
-              <th style="width:70px;">Status</th>
-              <th>Title</th>
-              <th style="width:80px;">Version</th>
-              <th style="width:80px;">Foundry</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#each allModulesRows}}
+      <div class="bsr-card">
+        <div class="bsr-card__header">
+          <span class="bsr-card__title"><i class="fa-solid fa-cubes"></i> {{labels.sectionAllMods}}</span>
+        </div>
+        <div class="bsr-card__body">
+          <table class="bsr-ts__table">
+            <thead>
               <tr>
-                <td class="bsr-ts__mono">{{id}}</td>
-                <td>{{#if active}}<span class="bsr-ts__badge bsr-ts__badge--active">active</span>{{else}}<span class="bsr-ts__badge bsr-ts__badge--inactive">off</span>{{/if}}</td>
-                <td>{{title}}</td>
-                <td class="bsr-ts__mono">{{version}}</td>
-                <td class="bsr-ts__mono">{{foundry}}</td>
+                <th>{{labels.thModuleID}}</th>
+                <th class="bsr-ts__col--status">{{labels.thStatus}}</th>
+                <th>{{labels.thTitle}}</th>
+                <th class="bsr-ts__col--version">{{labels.thVersion}}</th>
+                <th class="bsr-ts__col--foundry">{{labels.thFoundry}}</th>
               </tr>
-            {{/each}}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {{#each allModulesRows}}
+                <tr>
+                  <td class="bsr-ts__mono">{{id}}</td>
+                  <td>{{#if active}}<span class="bsr-ts__badge bsr-ts__badge--active">{{@root.labels.badgeActive}}</span>{{else}}<span class="bsr-ts__badge bsr-ts__badge--inactive">{{@root.labels.badgeOff}}</span>{{/if}}</td>
+                  <td>{{title}}</td>
+                  <td class="bsr-ts__mono">{{version}}</td>
+                  <td class="bsr-ts__mono">{{foundry}}</td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
       </div>
     {{/if}}
 
   </section>
 
-  <footer class="bsr-ts__footer">
-    <button type="button" data-action="reload"><i class="fas fa-sync"></i> Reload</button>
-    <button type="button" data-action="clearLog"><i class="fas fa-trash"></i> Clear Log</button>
-    <button type="button" data-action="export"><i class="fas fa-file-export"></i> Export Data</button>
+  <footer class="bsr-footer">
+    <div class="bsr-ts__debugMode">
+      <label class="bsr-ts__debugModeLabel">{{labels.lblDebug}}</label>
+      <select data-action="debugMode" class="bsr-ts__debugModeSelect">
+        {{#each debugModeChoices}}
+          <option value="{{value}}" {{#if (eq value ../debugMode)}}selected{{/if}}>{{label}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <button type="button" class="bsr-btn bsr-btn-sm" data-action="reload"><i class="fas fa-sync"></i> {{labels.btnReload}}</button>
+    <button type="button" class="bsr-btn bsr-btn-sm" data-action="clearLog"><i class="fas fa-trash"></i> {{labels.btnClearLog}}</button>
+    <button type="button" class="bsr-btn bsr-btn-sm" data-action="export"><i class="fas fa-file-export"></i> {{labels.btnExportData}}</button>
   </footer>
 
   <textarea data-json class="bsr-ts__hiddenJson">{{reportJson}}</textarea>

@@ -1,0 +1,36 @@
+<form class="bsr-form">
+  <p class="bsr-intro">{{labels.pageIntro}}</p>
+
+  <div class="bsr-card">
+    <div class="bsr-card__header">
+      <span class="bsr-card__title"><i class="fa-solid fa-user-shield"></i> {{labels.gmLegend}}</span>
+    </div>
+    <div class="bsr-card__body">
+      {{#each gmEntries}}
+        <label class="bsr-form-check">
+          <input type="checkbox" name="{{key}}" {{#if checked}}checked{{/if}}>
+          <span>{{label}}</span>
+        </label>
+      {{/each}}
+    </div>
+  </div>
+
+  <div class="bsr-card">
+    <div class="bsr-card__header">
+      <span class="bsr-card__title"><i class="fa-solid fa-user"></i> {{labels.playerLegend}}</span>
+    </div>
+    <div class="bsr-card__body">
+      {{#each playerEntries}}
+        <label class="bsr-form-check">
+          <input type="checkbox" name="{{key}}" {{#if checked}}checked{{/if}}>
+          <span>{{label}}</span>
+        </label>
+      {{/each}}
+    </div>
+  </div>
+
+  <footer class="bsr-footer">
+    <button type="button" class="bsr-btn" data-action="cancel">{{labels.cancel}}</button>
+    <button type="submit" class="bsr-btn bsr-btn-primary" data-action="save">{{labels.save}}</button>
+  </footer>
+</form>

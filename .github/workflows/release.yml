@@ -93,7 +93,16 @@ jobs:
           EXPECTED_DOWNLOAD: https://github.com/${{ github.repository }}/releases/download/${{ env.VERSION_TAG }}/blind-skill-rolls.zip
 
       - name: ZIP bauen
-        run: git archive --format=zip --output blind-skill-rolls.zip HEAD
+        run: |
+          zip -r blind-skill-rolls.zip \
+            module.json \
+            style.css \
+            scripts \
+            lang \
+            templates \
+            LICENSE \
+            README.md \
+            CHANGELOG.md
 
       - name: Release erstellen und Assets hochladen
         uses: actions/github-script@v8

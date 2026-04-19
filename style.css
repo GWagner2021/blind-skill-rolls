@@ -1,66 +1,479 @@
+/* =================================================================
+   Blind Skill Rolls (BSR) – Module Styles
+   =================================================================
+   Sections:
+   1. Chat Visibility
+   2. Shared UI Components
+   3. Settings UI – Main Page
+   4. Settings UI – Injected Controls
+   5. Settings UI – Skill & Save Grid
+   6. Roll-Config Dialog
+   7. NPC Reveal & Combat Tracker
+   8. Troubleshooter / Debug UI
+   ================================================================= */
+
+/* =========================
+   1. Chat Visibility
+   ========================= */
+
+/* Hidden messages are fully collapsed for non-GM users */
 .hidden_msg {
+   display: none !important;
+   visibility: hidden !important;
+   width: 0 !important;
+   height: 0 !important;
+   margin: 0 !important;
+   padding: 0 !important;
+   border: 0 !important;
+   overflow: hidden !important;
+}
 
-   display: none;
-   visibility: hidden;
-   width: 0px;
-   height: 0px;
+/* GM sees hidden messages with a visual indicator */
+html[data-bsr-gm="1"] .chat-message.hidden_msg {
+  display: flex !important;
+  visibility: visible !important;
+  width: auto !important;
+  height: auto !important;
+  margin: revert !important;
+  padding: revert !important;
+  border: 2px solid rgba(255,0,0,0.3) !important;
+  overflow: visible !important;
+  position: relative !important;
+}
 
+html[data-bsr-gm="1"] .chat-message.hidden_msg::before {
+  content: attr(data-bsr-hidden-label);
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  background: rgba(255,0,0,0.8);
+  color: white;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: bold;
+  border-radius: 3px;
+  z-index: 10;
 }
 
 /* =========================
-   BSR Troubleshooter
+   2. Shared UI Components
    ========================= */
-.bsr-ts__window { height: 100%; display: flex; flex-direction: column; gap: 4px; }
+
+/* --- Base form container --- */
+.bsr-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 0.5rem 0.25rem 0;
+}
+
+/* --- Card sections --- */
+.bsr-card {
+  border: 1px solid var(--bsr-border, #ccc);
+  border-radius: 0.5rem;
+  overflow: visible;
+}
+.bsr-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.75rem;
+  background: var(--bsr-card-header-bg, rgba(0,0,0,0.03));
+  border-bottom: 1px solid var(--bsr-border, #ccc);
+  font-weight: 600;
+  font-size: 0.9em;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+.bsr-card__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.bsr-card__title i {
+  font-size: 0.85em;
+  opacity: 0.5;
+}
+.bsr-card__actions {
+  display: flex;
+  gap: 0.35rem;
+}
+.bsr-card__body {
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* --- Form checks (checkbox + label) --- */
+.bsr-form-check {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.2rem 0;
+}
+.bsr-form-check input[type="checkbox"] {
+  flex-shrink: 0;
+}
+
+/* --- Form groups (label + control side by side) --- */
+.bsr-form-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.2rem 0;
+}
+.bsr-form-group__label {
+  flex-shrink: 0;
+  min-width: 12rem;
+  font-weight: 500;
+}
+.bsr-form-group__control {
+  flex: 1;
+  min-width: 0;
+}
+
+/* --- Hint / help text --- */
+.bsr-hint {
+  font-size: 0.84em;
+  opacity: 0.6;
+  margin: 0;
+  padding: 0;
+  line-height: 1.4;
+}
+/* Tighter hint coupling: when a hint follows a checkbox label, indent to align with label text */
+.bsr-form-check + .bsr-hint {
+  padding-left: 1.4rem;
+  margin-top: -0.1rem;
+}
+
+/* --- Intro / description text --- */
+.bsr-intro {
+  font-size: 0.88em;
+  opacity: 0.65;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* --- Buttons --- */
+.bsr-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.35rem;
+  font-weight: 500;
+  font-size: 0.88em;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  border: 1px solid var(--bsr-border, #ccc);
+  background: var(--bsr-btn-bg, transparent);
+  color: inherit;
+}
+.bsr-btn:hover {
+  background: var(--bsr-btn-hover-bg, rgba(0,0,0,0.06));
+}
+.bsr-btn-sm {
+  padding: 0.2rem 0.5rem;
+  font-size: 0.82em;
+}
+
+/* --- Footer with action buttons --- */
+.bsr-footer {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.6rem 0 0.15rem;
+  border-top: 1px solid var(--bsr-border, #ccc);
+  margin-top: 0.35rem;
+  flex-shrink: 0;
+}
+.bsr-footer .bsr-btn {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  font-size: 0.92em;
+}
+.bsr-footer .bsr-btn-primary {
+  background: var(--bsr-btn-primary-bg, #5e81ac);
+  color: var(--bsr-btn-primary-color, #fff);
+  border-color: var(--bsr-btn-primary-border, #4c6c91);
+  font-weight: 600;
+}
+.bsr-footer .bsr-btn-primary:hover {
+  background: var(--bsr-btn-primary-hover-bg, #4c6c91);
+}
+
+/* --- Alpha-capable color control (color swatch + opacity slider + label) --- */
+.bsr-alpha-color {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.bsr-alpha-color input[type="color"] {
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  border: 1px solid var(--bsr-border, #ccc);
+  border-radius: 0.3rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.bsr-alpha-slider {
+  flex: 1;
+  min-width: 4rem;
+  max-width: 10rem;
+  cursor: pointer;
+}
+.bsr-alpha-value {
+  font-size: 0.84em;
+  font-weight: 500;
+  min-width: 2.5rem;
+  text-align: right;
+  opacity: 0.7;
+}
+
+/* --- Divider --- */
+.bsr-divider {
+  border: none;
+  border-top: 1px solid var(--bsr-border, #ccc);
+  opacity: 0.4;
+  margin: 0;
+}
+
+/* --- In-card section label (light sub-heading within a card body) --- */
+.bsr-section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.86em;
+  font-weight: 600;
+  opacity: 0.65;
+  padding-top: 0.35rem;
+  margin-top: 0.15rem;
+  border-top: 1px solid var(--bsr-border, #ccc);
+  border-top-color: rgba(128,128,128,0.2);
+}
+.bsr-section-label i {
+  font-size: 0.85em;
+  opacity: 0.6;
+}
+
+/* =========================
+   3. Settings UI – Main Page
+   ========================= */
+
+/* Each submenu entry: stacked layout with separator */
+.bsr-main-settings .form-group.submenu {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0.85rem;
+  margin-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(128,128,128,0.2);
+}
+.bsr-main-settings .form-group.submenu:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* Hide the native label heading — button already carries the name */
+.bsr-main-settings .form-group.submenu > label:first-child {
+  display: none;
+}
+
+/* Full-width button, left-aligned with icon */
+.bsr-main-settings .form-group.submenu .form-fields {
+  width: 100%;
+}
+.bsr-main-settings .form-group.submenu button {
+  width: 100%;
+  text-align: left;
+  justify-content: flex-start;
+  gap: 0.45rem;
+  padding: 0.5rem 0.75rem;
+  font-weight: 500;
+  font-size: 0.95em;
+}
+
+/* Hint / description below button */
+.bsr-main-settings .form-group.submenu .notes {
+  margin-top: 0.35rem;
+  font-size: 0.84em;
+  opacity: 0.6;
+  padding-left: 0.15rem;
+  line-height: 1.4;
+}
+
+/* =========================
+   4. Settings UI – Injected Controls
+   ========================= */
+
+.bsr-inject {
+  margin-top: 0.75rem;
+}
+.bsr-inject__legend {
+  font-weight: 600;
+}
+.bsr-inject__divider {
+  margin: 0.6rem 0;
+}
+.bsr-inject__npc-repl {
+  margin-top: 0.35rem;
+}
+.bsr-inject__npc-repl .bsr-form-group__label {
+  min-width: 14rem;
+}
+
+/* =========================
+   5. Settings UI – Skill & Save Grid
+   ========================= */
+
+.bsr-skill-grid {
+  display: grid;
+  grid-template-columns: 1fr auto auto 1px 1fr auto auto;
+  gap: 0.25rem 0.6rem;
+  align-items: center;
+  padding: 0.35rem 0 0.25rem;
+  margin-top: 0.15rem;
+  border-top: 1px solid rgba(128,128,128,0.15);
+}
+.bsr-skill-grid__colhdr {
+  text-align: center;
+  font-size: 0.85em;
+  font-weight: 600;
+  opacity: 0.7;
+  padding-bottom: 0.15rem;
+}
+.bsr-skill-grid__name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0.15rem 0;
+}
+.bsr-skill-grid__cb {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.bsr-skill-grid__sep {
+  background: var(--bsr-border, var(--color-border-light-2, #b5b5a6));
+  width: 1px;
+  align-self: stretch;
+}
+
+/* =========================
+   6. Roll-Config Dialog
+   ========================= */
+
+.bsr-rollmode--locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.bsr-rollmode-note {
+  font-size: 0.85em;
+  margin: 0.25rem 0 0 0;
+  font-style: italic;
+}
+.bsr-rollmode-note--blind {
+  color: #ff6b6b;
+}
+.bsr-rollmode-note--private {
+  color: #f0a030;
+}
+
+/* Revealed-to-roller badge on chat messages */
+.bsr-revealed-badge {
+  margin-right: 0.25rem;
+  font-size: 0.8em;
+  color: #4caf50;
+  font-style: italic;
+}
+
+/* Shared spacing for inline metadata icons */
+.bsr-meta-icon {
+  margin-right: 0.25rem;
+}
+
+/* =========================
+   7. NPC Reveal & Combat Tracker
+   ========================= */
+
+/* Permanent reveal badge on chat messages */
+.bsr-perm-badge {
+  color: #4fc3f7;
+  font-size: 0.75em;
+  margin-left: 0.3em;
+  vertical-align: middle;
+  opacity: 0.85;
+  cursor: default;
+}
+
+/* Combat tracker visibility toggle icon */
+.bsr-ct-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.7;
+  font-size: inherit;
+  color: inherit;
+}
+.bsr-ct-toggle:hover {
+  opacity: 1;
+  color: #4fc3f7;
+}
+
+/* =========================
+   8. Troubleshooter / Debug UI
+   ========================= */
+
+#bsr-troubleshooter > .window-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden !important;
+}
+
+.bsr-ts { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px; }
 
 .bsr-ts__tabs {
   display: flex; gap: 4px;
-  border-bottom: 1px solid var(--color-border-light-2);
+  border-bottom: 1px solid var(--bsr-border, #ccc);
   padding: 2px 4px 6px;
+  flex-shrink: 0;
 }
 .bsr-ts__tab {
-  appearance: none; border: 1px solid transparent; background: transparent;
-  color: var(--color-text-light-2);
-  padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 0.9em;
-  cursor: pointer; transition: background 0.15s, color 0.15s;
+  opacity: 0.7;
+  transition: opacity 0.15s;
 }
-.bsr-ts__tab:hover { background: rgba(255,255,255,0.05); color: var(--color-text-light-1); }
-.bsr-ts__tab.is-active {
-  color: var(--color-text-light-0);
-  background: rgba(255,255,255,0.09);
-  border-color: var(--color-border-light-2);
-}
-
-.bsr-ts__body { flex: 1; overflow: auto; padding: 0 4px 4px; display: flex; flex-direction: column; gap: 8px; }
-
-.bsr-ts__card {
-  border: 1px solid var(--color-border-light-2);
-  border-radius: 8px;
-  background: rgba(255,255,255,0.02);
-  padding: 8px 10px;
+.bsr-ts__tab:hover { opacity: 0.9; }
+.bsr-ts__tab--active {
+  opacity: 1;
+  font-weight: 600;
+  border-color: var(--bsr-btn-primary-border, #4c6c91);
+  background: var(--bsr-btn-primary-bg, #5e81ac) !important;
+  color: var(--bsr-btn-primary-color, #fff) !important;
 }
 
-.bsr-ts__sectionTitle { margin: 0 0 6px; font-size: 1.0em; font-weight: 650; opacity: 0.96; }
+.bsr-ts__body { flex: 1; min-height: 0; overflow: auto; padding: 0 4px 4px; display: flex; flex-direction: column; gap: 8px; }
 
-/* Summary info strip */
+/* Override bsr-card__body for settings density */
+.bsr-ts__settingsBody { padding: 0.45rem 0.55rem; }
+
+/* Summary info strip — horizontal flex inside bsr-card__body */
 .bsr-ts__infoStrip {
   display: flex; flex-wrap: wrap; gap: 6px 16px;
-  padding: 6px 10px;
-  border: 1px solid var(--color-border-light-2);
-  border-radius: 8px;
-  background: rgba(255,255,255,0.03);
   font-size: 0.88em;
 }
-.bsr-ts__infoItem { display: flex; gap: 5px; align-items: baseline; white-space: nowrap; }
-.bsr-ts__infoLabel { opacity: 0.7; font-weight: 600; }
-.bsr-ts__infoValue { font-weight: 500; }
+.bsr-ts__infoItem { display: flex; gap: 5px; align-items: baseline; }
+.bsr-ts__infoLabel { opacity: 0.7; font-weight: 600; white-space: nowrap; }
+.bsr-ts__infoValue { font-weight: 500; word-break: break-word; }
 
 .bsr-ts__group { margin-top: 8px; }
 .bsr-ts__group:first-child { margin-top: 0; }
 .bsr-ts__groupHeader {
   padding: 5px 10px;
-  border: 1px solid var(--color-border-light-2);
+  border: 1px solid var(--bsr-border, #ccc);
   border-radius: 6px 6px 0 0;
-  background: rgba(255,255,255,0.04);
+  background: var(--bsr-card-header-bg, rgba(0,0,0,0.03));
   font-weight: 650; font-size: 0.88em;
   opacity: 0.95;
 }
@@ -87,10 +500,10 @@
   gap: 5px;
   align-items: baseline;
   padding: 4px 10px;
-  border: 1px solid var(--color-border-light-2);
+  border: 1px solid var(--bsr-border, #ccc);
   border-bottom: none;
   border-radius: 6px 6px 0 0;
-  background: rgba(255,255,255,0.03);
+  background: var(--bsr-card-header-bg, rgba(0,0,0,0.03));
   font-size: 0.86em;
   white-space: nowrap;
 }
@@ -110,13 +523,14 @@
 .bsr-ts__table { width: 100%; border-collapse: collapse; }
 .bsr-ts__table th, .bsr-ts__table td {
   padding: 4px 8px;
-  border-bottom: 1px solid var(--color-border-light-2);
+  border-bottom: 1px solid var(--bsr-border, #ccc);
   vertical-align: top;
   font-size: 0.88em;
 }
 .bsr-ts__table thead th {
   position: sticky; top: 0;
-  background: var(--color-bg);
+  background: var(--bsr-bg, var(--color-bg));
+  color: inherit;
   z-index: 1;
   text-align: left;
   font-weight: 650;
@@ -126,19 +540,19 @@
   opacity: 0.8;
   padding: 5px 8px;
 }
-.bsr-ts__table tbody tr:nth-child(odd) { background: rgba(255,255,255,0.015); }
+.bsr-ts__table tbody tr:nth-child(odd) { background: var(--bsr-card-header-bg, rgba(0,0,0,0.02)); }
 
 /* Fixed layout for settings so values align under each other */
 .bsr-ts__table--fixed {
   table-layout: fixed;
-  border: 1px solid var(--color-border-light-2);
+  border: 1px solid var(--bsr-border, #ccc);
   border-top: none;
   border-radius: 0 0 6px 6px;
   overflow: hidden;
 }
 .bsr-ts__table--fixed thead { display: none; }
-.bsr-ts__colSetting { width: 62%; }
-.bsr-ts__colValue { width: 38%; text-align: left; }
+.bsr-ts__table--fixed td:first-child { width: 62%; }
+.bsr-ts__table--fixed td:last-child { width: 38%; text-align: left; }
 
 .bsr-ts__settingName { word-break: break-word; }
 .bsr-ts__settingValue {
@@ -159,80 +573,36 @@
   line-height: 1.5;
 }
 .bsr-ts__badge--active { background: rgba(76,175,80,0.18); color: #66bb6a; }
-.bsr-ts__badge--inactive { background: rgba(255,255,255,0.05); color: var(--color-text-light-2); opacity: 0.6; }
+.bsr-ts__badge--inactive { opacity: 0.5; }
 
-/* Footer */
-.bsr-ts__footer {
-  display: flex; gap: 6px;
-  padding: 6px 4px 4px;
-  border-top: 1px solid var(--color-border-light-2);
+/* Debug mode control in footer */
+.bsr-ts__debugMode {
+  display: flex; align-items: center; gap: 4px;
+  flex-shrink: 0;
 }
-.bsr-ts__footer button {
-  flex: 1; padding: 6px 8px;
-  border-radius: 6px; font-weight: 600; font-size: 0.88em;
+.bsr-ts__debugModeLabel {
+  font-size: 0.82em; font-weight: 600; opacity: 0.7;
+  white-space: nowrap;
+}
+.bsr-ts__debugModeSelect {
+  font-size: 0.82em; padding: 3px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--bsr-border, #ccc);
+  background: var(--bsr-input-bg, #fff);
+  color: inherit;
 }
 
 .bsr-ts__mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
   font-size: 0.92em;
 }
-.bsr-ts__muted { opacity: 0.7; font-size: 0.88em; }
 .bsr-ts__hiddenJson { display: none; }
 
-/* =========================
-   BSR Skill Settings – compact two-column grid
-   ========================= */
-.bsr-skill-grid {
-  display: grid;
-  grid-template-columns: 1fr auto auto 1px 1fr auto auto;
-  gap: .2rem .6rem;
-  align-items: center;
-}
-.bsr-skill-grid__colhdr {
-  text-align: center;
-  font-size: 0.85em;
-}
-.bsr-skill-grid__name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.bsr-skill-grid__cb {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.bsr-skill-grid__sep {
-  background: var(--color-border-light-2, #ccc);
-  width: 1px;
-  align-self: stretch;
-}
-
-/* =========================
-   BSR Permanent Reveal Badge
-   ========================= */
-.bsr-perm-badge {
-  color: #4fc3f7;
-  font-size: 0.75em;
-  margin-left: 0.3em;
-  vertical-align: middle;
-  opacity: 0.85;
-  cursor: default;
-}
-
-/* =========================
-   BSR Combat Tracker Toggle
-   ========================= */
-.bsr-ct-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  opacity: 0.7;
-  font-size: inherit;
-  color: inherit;
-}
-.bsr-ct-toggle:hover {
-  opacity: 1;
-  color: #4fc3f7;
-}
+/* Column width classes for troubleshooter tables */
+.bsr-ts__col--time    { width: 150px; }
+.bsr-ts__col--level   { width: 70px; }
+.bsr-ts__col--origin  { width: 120px; }
+.bsr-ts__col--source  { width: 130px; }
+.bsr-ts__col--status  { width: 70px; }
+.bsr-ts__col--version { width: 80px; }
+.bsr-ts__col--foundry { width: 80px; }

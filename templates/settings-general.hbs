@@ -1,0 +1,83 @@
+<form class="bsr-form">
+  <div class="bsr-card">
+    <div class="bsr-card__header">
+      <span class="bsr-card__title"><i class="fa-solid fa-palette"></i> {{labels.appearance}}</span>
+    </div>
+    <div class="bsr-card__body">
+      <div class="bsr-form-group">
+        <label class="bsr-form-group__label">{{labels.themeName}}</label>
+        <select name="bsrTheme" class="bsr-form-group__control">
+          <option value="light" {{#if themeLight}}selected{{/if}}>{{labels.themeLight}}</option>
+          <option value="dark" {{#if themeDark}}selected{{/if}}>{{labels.themeDark}}</option>
+        </select>
+      </div>
+      <p class="bsr-hint">{{labels.themeHint}}</p>
+    </div>
+  </div>
+
+  <div class="bsr-card">
+    <div class="bsr-card__header">
+      <span class="bsr-card__title"><i class="fa-solid fa-gear"></i> {{labels.integration}}</span>
+    </div>
+    <div class="bsr-card__body">
+      <label class="bsr-form-check">
+        <input type="checkbox" name="showSyncMessages" {{#if showSyncMessages}}checked{{/if}}>
+        <span>{{labels.syncName}}</span>
+      </label>
+      <p class="bsr-hint">{{labels.syncHint}}</p>
+
+      <div class="bsr-section-label"><i class="fa-solid fa-dice-d20"></i> {{labels.dsnSection}}</div>
+      <div class="bsr-form-group">
+        <label class="bsr-form-group__label">{{labels.dsnName}}</label>
+        <select name="dsnGhostDiceMode" class="bsr-form-group__control">
+          <option value="0" {{#if dsnOff}}selected{{/if}}>{{labels.dsnOff}}</option>
+          <option value="2" {{#if dsnAuthor}}selected{{/if}}>{{labels.dsnAuthor}}</option>
+          <option value="1" {{#if dsnOn}}selected{{/if}}>{{labels.dsnOn}}</option>
+        </select>
+      </div>
+      <p class="bsr-hint">{{labels.dsnHint}}</p>
+    </div>
+  </div>
+
+  <div class="bsr-card">
+    <div class="bsr-card__header">
+      <span class="bsr-card__title"><i class="fa-solid fa-palette"></i> {{labels.cardColors}}</span>
+    </div>
+    <div class="bsr-card__body">
+      <label class="bsr-form-check">
+        <input type="checkbox" name="customColors" {{#if customColors}}checked{{/if}}>
+        <span>{{labels.customColorsName}}</span>
+      </label>
+      <p class="bsr-hint">{{labels.customColorsHint}}</p>
+      <div class="bsr-form-group">
+        <label class="bsr-form-group__label">{{labels.blindColorName}}</label>
+        <div class="bsr-form-group__control bsr-color-control">
+          <div class="bsr-alpha-color">
+            <input type="color" name="blindCardColorRgb" value="{{blindCardColorRgb}}">
+            <input type="range" class="bsr-alpha-slider" name="blindCardColorAlpha" min="0" max="255" value="{{blindCardColorAlpha}}">
+            <output class="bsr-alpha-value">{{blindCardColorAlphaLabel}}</output>
+          </div>
+          <button type="button" class="bsr-btn bsr-btn-sm" data-action="resetBlindColor" title="{{labels.resetColor}}"><i class="fa-solid fa-rotate-left"></i></button>
+        </div>
+      </div>
+      <p class="bsr-hint">{{labels.blindColorHint}}</p>
+      <div class="bsr-form-group">
+        <label class="bsr-form-group__label">{{labels.privateColorName}}</label>
+        <div class="bsr-form-group__control bsr-color-control">
+          <div class="bsr-alpha-color">
+            <input type="color" name="privateCardColorRgb" value="{{privateCardColorRgb}}">
+            <input type="range" class="bsr-alpha-slider" name="privateCardColorAlpha" min="0" max="255" value="{{privateCardColorAlpha}}">
+            <output class="bsr-alpha-value">{{privateCardColorAlphaLabel}}</output>
+          </div>
+          <button type="button" class="bsr-btn bsr-btn-sm" data-action="resetPrivateColor" title="{{labels.resetColor}}"><i class="fa-solid fa-rotate-left"></i></button>
+        </div>
+      </div>
+      <p class="bsr-hint">{{labels.privateColorHint}}</p>
+    </div>
+  </div>
+
+  <footer class="bsr-footer">
+    <button type="button" class="bsr-btn" data-action="cancel">{{labels.cancel}}</button>
+    <button type="submit" class="bsr-btn bsr-btn-primary" data-action="save">{{labels.save}}</button>
+  </footer>
+</form>
