@@ -12,6 +12,8 @@ The main features are described below, followed by additional helpers for hidden
 
 At its core, Blind Skill Rolls lets you decide that specific skill checks and saving throws should no longer behave like ordinary public rolls. You can configure each skill and each ability save individually and decide whether it should default to **Blind GM Roll** or **Private GM Roll**. That makes it much easier to keep checks like Insight, Investigation, Perception, or Stealth as well as important defensive saves under tighter control without changing the roll mode by hand every time. Blind and Private are handled as separate modes, so you can decide exactly how much the roller should still be allowed to see.
 
+[Blind & Private Rolls – Visibility Matrix](https://github.com/GWagner2021/blind-skill-rolls/wiki/Blind-&-Private-Rolls-%E2%80%93-Visibility-Matrix)
+
 ## 💀 Death save privacy
 
 Death saves get dedicated handling and can be kept public, limited to the GM and the roller, or fully blind. That allows them to stay uncertain and dramatic when that is the tone you want for your table. In blind mode, death save result indicators are also hidden from players on supported UI elements, so the outcome is not exposed somewhere else immediately.
