@@ -4,7 +4,7 @@ import { consumeDsnPendingMode } from "../../core/state/pending-dsn.js";
 import { isPendingHiddenNpc } from "../../core/state/pending-hidden-npc.js";
 import { isSkillPrivate, isSkillBlind } from "../../core/policy/skill-policy.js";
 import { isSavePrivate, isSaveBlind } from "../../core/policy/save-policy.js";
-import { MOD } from "../../core/constants.js";
+import { shouldHideForeignSecrets } from "../../core/policy/chat-privacy.js";
 
 Hooks.on("diceSoNiceRollStart", (messageID: string, context: any) => {
   try {
@@ -111,8 +111,6 @@ function hasBsrGhostMarker(notation: DiceNotation): boolean {
   return false;
 }
 
-const OPT_HIDE = (): boolean => { try { return game.settings.get(MOD, "hideForeignSecrets") as boolean; } catch { return true; } };
-
 const isPendingSkillPrivate = (): boolean => {
   const key = peekPendingSkill();
   return key ? isSkillPrivate(key) : false;
@@ -170,7 +168,7 @@ Hooks.on("diceSoNiceReady", () => {
 
         if (!blind && isPrivateRoll) {
           const authorizedUsers = Array.from(new Set([...gmIds, rollerId].filter(Boolean) as string[]));
-          if (OPT_HIDE()) {
+          if (shouldHideForeignSecrets()) {
             users = authorizedUsers;
             blockNonAllowed = true;
           } else {

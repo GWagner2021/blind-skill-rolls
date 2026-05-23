@@ -123,6 +123,7 @@ Hooks.on("preCreateChatMessage", (msg, data, options, userId) => {
             return;
         const recipients = buildMessageRecipients(vis.mode, authorId);
         msg.updateSource({ blind: recipients.blind, whisper: recipients.whisper });
+        msg.updateSource({ [`flags.${MOD}.rollKind`]: "save" });
         if (recipients.bsrBlind) {
             msg.updateSource({ [`flags.${MOD}.bsrBlind`]: true });
         }

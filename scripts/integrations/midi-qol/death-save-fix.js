@@ -1,5 +1,6 @@
 import { MOD, BLIND, GMROLL } from "../../core/constants.js";
 import { resolveDeathSaveVisibility, buildMessageRecipients } from "../../core/policy/roll-visibility.js";
+import { shouldHideForeignSecrets } from "../../core/policy/chat-privacy.js";
 import { setDsnPendingMode } from "../../core/state/pending-dsn.js";
 import { dbgDebug, dbgWarn } from "../../debug/logger.js";
 const MIDI_ID = "midi-qol";
@@ -29,12 +30,15 @@ Hooks.on("dnd5e.preRollSavingThrowV2", (cfg) => {
     try {
         if (!cfg)
             return;
+        const hookNames = Array.isArray(cfg.hookNames) ? cfg.hookNames : [];
         const isDeath = cfg.type === "death" ||
             cfg.rollType === "death" ||
             cfg.subject?.type === "death" ||
             cfg.data?.type === "death" ||
+            cfg.hook === "deathSave" ||
             cfg.hook === "rollDeathSave" ||
-            cfg.hookNames?.includes?.("rollDeathSave");
+            hookNames.includes("deathSave") ||
+            hookNames.includes("rollDeathSave");
         if (isDeath)
             handleDeathSavePreRoll();
     }
@@ -100,15 +104,7 @@ Hooks.on("preCreateChatMessage", (msg, data) => {
 // ─── Whisper-fixup for BSR-managed messages ───────────────────────────────
 function fixWhisperOverride(msg, flags) {
     if (flags.bsrPrivate && Array.isArray(msg.whisper) && msg.whisper.length > 0) {
-        const hideSecrets = (() => {
-            try {
-                return game.settings.get(MOD, "hideForeignSecrets");
-            }
-            catch {
-                return true;
-            }
-        })();
-        if (!hideSecrets) {
+        if (!shouldHideForeignSecrets()) {
             msg.updateSource({ whisper: [], blind: false });
             dbgDebug("midi-death-fix | re-cleared whisper (MidiQOL override detected)");
         }

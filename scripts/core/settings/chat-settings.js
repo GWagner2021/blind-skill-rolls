@@ -5,8 +5,8 @@ import { parseHexAlpha, toHexAlpha, alphaToPercent } from "../../ui/color-utils.
 import { dbgInfo, dbgWarn } from "../../debug/logger.js";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 Hooks.once("init", () => {
-    game.settings.register(MOD, "hideForeignSecrets", { name: L("BSR.Chat.Settings.HideForeign.Name", "Hide other players' secret messages"), hint: L("BSR.Chat.Settings.HideForeign.Hint", "Hide blind rolls and whispers that are not addressed to the current player."), scope: "world", config: false, restricted: true, type: Boolean, default: true });
-    game.settings.register(MOD, "muteForeignSecretSounds", { name: L("BSR.Chat.Settings.MuteForeign.Name", "Mute other players' dice sounds"), hint: L("BSR.Chat.Settings.MuteForeign.Hint", "Suppress dice sounds for secret rolls made by other players."), scope: "world", config: false, restricted: true, type: Boolean, default: true });
+    game.settings.register(MOD, "hideForeignSecrets", { name: L("BSR.Chat.Settings.HideForeign.Name", "Hide other players' secret messages"), hint: L("BSR.Chat.Settings.HideForeign.Hint", "Hide blind rolls and whispers that are not addressed to the current player. Also mutes their dice sounds."), scope: "world", config: false, restricted: true, type: Boolean, default: true });
+    game.settings.register(MOD, "muteForeignSecretSounds", { name: L("BSR.Chat.Settings.MuteForeign.Name", "Mute other players' dice sounds"), hint: L("BSR.Chat.Settings.MuteForeign.Hint", "Controls muting for other players' Private GM and Self Only roll sounds. Blind GM rolls are always muted."), scope: "world", config: false, restricted: true, type: Boolean, default: true });
     game.settings.register(MOD, "bsrSanitizePublicGm", { name: L("BSR.Chat.Settings.GmSanitize.Name", "Strip roll details from public GM rolls"), hint: L("BSR.Chat.Settings.GmSanitize.Hint", "Remove dice formulas and tooltips from public GM rolls so players only see the result, not how it was calculated."), scope: "world", config: false, restricted: true, type: Boolean, default: true });
     game.settings.register(MOD, "bsrTrustedSeeDetails", { name: L("BSR.Chat.Settings.TrustedDetails.Name", "Trusted players can see GM roll details"), hint: L("BSR.Chat.Settings.TrustedDetails.Hint", "When enabled, players with the Trusted role or higher can still see dice formulas and tooltips on public GM rolls, even when stripping is active."), scope: "world", config: false, restricted: true, type: Boolean, default: false });
     game.settings.register(MOD, "bsrNpcMaskDefault", { name: L("BSR.NPC.Settings.MaskDefault.Name", "Hide NPC names from players"), hint: L("BSR.NPC.Settings.MaskDefault.Hint", "When enabled, NPC names in chat and the combat tracker are hidden from players until explicitly revealed."), scope: "world", config: false, restricted: true, type: Boolean, default: false });
@@ -33,7 +33,6 @@ Hooks.once("init", () => {
             return {
                 ...context,
                 hide: !!getSetting("hideForeignSecrets", true),
-                mute: !!getSetting("muteForeignSecretSounds", true),
                 sanitize: !!getSetting("bsrSanitizePublicGm", true),
                 trusted: !!getSetting("bsrTrustedSeeDetails", false),
                 maskDef: !!getSetting("bsrNpcMaskDefault", false),
@@ -41,9 +40,7 @@ Hooks.once("init", () => {
                 labels: {
                     chatDisplay: L("BSR.Chat.Section.ChatDisplay", "Chat Display & Privacy"),
                     hideForeignName: L("BSR.Chat.Settings.HideForeign.Name", "Hide other players' secret messages"),
-                    hideForeignHint: L("BSR.Chat.Settings.HideForeign.Hint", "Hide blind rolls and whispers that are not addressed to the current player."),
-                    muteForeignName: L("BSR.Chat.Settings.MuteForeign.Name", "Mute other players' dice sounds"),
-                    muteForeignHint: L("BSR.Chat.Settings.MuteForeign.Hint", "Suppress dice sounds for secret rolls made by other players."),
+                    hideForeignHint: L("BSR.Chat.Settings.HideForeign.Hint", "Hide blind rolls and whispers that are not addressed to the current player. Also mutes their dice sounds."),
                     gmRolls: L("BSR.Chat.Section.GMRolls", "GM Roll Privacy"),
                     sanitizeName: L("BSR.Chat.Settings.GmSanitize.Name", "Strip roll details from public GM rolls"),
                     sanitizeHint: L("BSR.Chat.Settings.GmSanitize.Hint", "Remove dice formulas and tooltips from public GM rolls so players only see the result, not how it was calculated."),
@@ -75,15 +72,13 @@ Hooks.once("init", () => {
             if (!form)
                 return;
             const fd = new foundry.applications.ux.FormDataExtended(form).object;
-            await game.settings.set(MOD, "hideForeignSecrets", !!fd.hide);
-            await game.settings.set(MOD, "muteForeignSecretSounds", !!fd.mute);
+            const hideForeignSecrets = !!fd.hide;
+            await game.settings.set(MOD, "hideForeignSecrets", hideForeignSecrets);
+            await game.settings.set(MOD, "muteForeignSecretSounds", hideForeignSecrets);
             await game.settings.set(MOD, "bsrSanitizePublicGm", !!fd.sanitize);
             await game.settings.set(MOD, "bsrTrustedSeeDetails", !!fd.trusted);
             await game.settings.set(MOD, "bsrNpcMaskDefault", !!fd.maskDef);
             await game.settings.set(MOD, "bsrNpcNameReplacement", String(fd.repl ?? "").trim());
-            if (!!fd.hide && !fd.mute) {
-                ui.notifications?.warn(L("BSR.Chat.Warn.HideWithoutMute", "Secret messages are hidden but dice sounds are not muted — other players will hear dice sounds without seeing a chat card or dice."));
-            }
             this.close();
         }
         async _onSaveAction() { await this.#onSave({ target: { form: this.element.querySelector("form"), closest: () => this.element.querySelector("form") } }); }
@@ -198,7 +193,7 @@ Hooks.once("init", () => {
             const fs = document.createElement("fieldset");
             fs.className = "form-group bsr-chatdisplay bsr-inject";
             // ── Chat Display & Privacy ──
-            fs.append(_legend(L("BSR.Chat.Section.ChatDisplay", "Chat Display & Privacy")), _checkbox("bsrHide", L("BSR.Chat.Settings.HideForeign.Name", "Hide other players' secret messages"), getSetting("hideForeignSecrets", true), dis), _hint(L("BSR.Chat.Settings.HideForeign.Hint", "Hide blind rolls and whispers that are not addressed to the current player.")), _checkbox("bsrMute", L("BSR.Chat.Settings.MuteForeign.Name", "Mute other players' dice sounds"), getSetting("muteForeignSecretSounds", true), dis), _hint(L("BSR.Chat.Settings.MuteForeign.Hint", "Suppress dice sounds for secret rolls made by other players.")));
+            fs.append(_legend(L("BSR.Chat.Section.ChatDisplay", "Chat Display & Privacy")), _checkbox("bsrHide", L("BSR.Chat.Settings.HideForeign.Name", "Hide other players' secret messages"), getSetting("hideForeignSecrets", true), dis), _hint(L("BSR.Chat.Settings.HideForeign.Hint", "Hide blind rolls and whispers that are not addressed to the current player. Also mutes their dice sounds.")));
             // ── GM Rolls ──
             fs.append(_divider(), _legend(L("BSR.Chat.Section.GMRolls", "GM Roll Privacy")), _checkbox("bsrSanitize", L("BSR.Chat.Settings.GmSanitize.Name", "Strip roll details from public GM rolls"), getSetting("bsrSanitizePublicGm", true), dis), _hint(L("BSR.Chat.Settings.GmSanitize.Hint", "Remove dice formulas and tooltips from public GM rolls so players only see the result, not how it was calculated.")), _checkbox("bsrTrusted", L("BSR.Chat.Settings.TrustedDetails.Name", "Trusted players can see GM roll details"), getSetting("bsrTrustedSeeDetails", false), dis), _hint(L("BSR.Chat.Settings.TrustedDetails.Hint", "When enabled, players with the Trusted role or higher can still see dice formulas and tooltips on public GM rolls, even when stripping is active.")));
             // ── Chat Card Colors (client-scoped, all users) ──
@@ -257,8 +252,11 @@ Hooks.once("init", () => {
                 const bind = (name, key) => {
                     fs.querySelector(`input[name="${name}"]`)?.addEventListener("change", (ev) => game.settings.set(MOD, key, ev.currentTarget.checked));
                 };
-                bind("bsrHide", "hideForeignSecrets");
-                bind("bsrMute", "muteForeignSecretSounds");
+                fs.querySelector(`input[name="bsrHide"]`)?.addEventListener("change", (ev) => {
+                    const enabled = ev.currentTarget.checked;
+                    game.settings.set(MOD, "hideForeignSecrets", enabled);
+                    game.settings.set(MOD, "muteForeignSecretSounds", enabled);
+                });
                 bind("bsrSanitize", "bsrSanitizePublicGm");
                 bind("bsrTrusted", "bsrTrustedSeeDetails");
                 bind("bsrNpcMaskDefault", "bsrNpcMaskDefault");

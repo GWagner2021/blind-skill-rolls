@@ -1,5 +1,4 @@
 import { MOD, BLIND, GMROLL } from "../core/constants.js";
-import { isDeathSaveMessage } from "../core/policy/roll-classification.js";
 import { resolveSkillVisibility, buildMessageRecipients } from "../core/policy/roll-visibility.js";
 import { setPendingSkill, peekPendingSkill, clearPendingSkill, clearPendingSkillsForActor } from "../core/state/pending-skill.js";
 import { setDsnPendingMode } from "../core/state/pending-dsn.js";
@@ -29,12 +28,21 @@ const revealToRoller = async (message) => {
         return;
     await message.setFlag(MOD, "revealedToRoller", true);
 };
+const revealToEveryone = async (message) => {
+    if (!message)
+        return;
+    await message.update({
+        blind: false,
+        whisper: [],
+        [`flags.${MOD}.bsrBlind`]: false,
+        [`flags.${MOD}.bsrPrivate`]: false,
+        [`flags.${MOD}.revealedToRoller`]: false
+    });
+};
 const canRevealToRoller = (message) => {
     if (!message)
         return false;
     if (!message.blind && !message.getFlag?.(MOD, "bsrBlind"))
-        return false;
-    if (isDeathSaveMessage(message))
         return false;
     try {
         if (message.getFlag?.(MOD, "revealedToRoller"))
@@ -49,9 +57,49 @@ const canRevealToRoller = (message) => {
         return false;
     return true;
 };
-// ---- Context-Menu: "Reveal to Roller" ----
+const canRevealBsrPrivateToEveryone = (message) => {
+    if (!message || !game.user?.isGM)
+        return false;
+    try {
+        if (!message.getFlag?.(MOD, "bsrPrivate"))
+            return false;
+    }
+    catch {
+        return false;
+    }
+    return !!message.blind || (Array.isArray(message.whisper) && message.whisper.length > 0) || !!message.getFlag?.(MOD, "bsrPrivate");
+};
+const isBsrPrivateMessage = (message) => {
+    try {
+        return !!message?.getFlag?.(MOD, "bsrPrivate");
+    }
+    catch {
+        return false;
+    }
+};
+function suppressCoreMakePrivateForBsrPrivate(menuItems) {
+    const coreConceal = menuItems.find((entry) => entry?.label === "CHAT.ConcealMessage" ||
+        entry?.name === "CHAT.ConcealMessage" ||
+        entry?.name === "Make Private");
+    if (!coreConceal || coreConceal._bsrConcealWrapped)
+        return;
+    const originalVisible = coreConceal.visible;
+    const originalCondition = coreConceal.condition;
+    coreConceal.visible = (target) => {
+        if (isBsrPrivateMessage(getMsgFromLi(target)))
+            return false;
+        if (typeof originalVisible === "function")
+            return originalVisible(target);
+        if (typeof originalCondition === "function")
+            return originalCondition(target);
+        return originalVisible ?? true;
+    };
+    coreConceal._bsrConcealWrapped = true;
+}
+// ---- Context-Menu: reveal actions ----
 Hooks.on("getChatMessageContextOptions", (app, menuItems) => {
-    const entry = {
+    suppressCoreMakePrivateForBsrPrivate(menuItems);
+    const revealToRollerEntry = {
         name: game.i18n?.has?.("BSR.Skills.Action.RevealToRoller")
             ? game.i18n.localize("BSR.Skills.Action.RevealToRoller")
             : "Reveal to roller",
@@ -63,9 +111,17 @@ Hooks.on("getChatMessageContextOptions", (app, menuItems) => {
         },
         callback: async (target) => revealToRoller(getMsgFromLi(target))
     };
+    const revealToEveryoneEntry = {
+        name: game.i18n?.has?.("BSR.Chat.Action.RevealToEveryone")
+            ? game.i18n.localize("BSR.Chat.Action.RevealToEveryone")
+            : "Reveal To Everyone",
+        icon: '<i class="fa-solid fa-eye"></i>',
+        condition: (target) => canRevealBsrPrivateToEveryone(getMsgFromLi(target)),
+        callback: async (target) => revealToEveryone(getMsgFromLi(target))
+    };
     const revealEveryoneIdx = menuItems.findIndex((i) => i.icon?.includes("fa-eye"));
     const insertAt = revealEveryoneIdx >= 0 ? revealEveryoneIdx + 1 : menuItems.length;
-    menuItems.splice(insertAt, 0, entry);
+    menuItems.splice(insertAt, 0, revealToEveryoneEntry, revealToRollerEntry);
 });
 const resolveActorId = (cfg) => cfg?.subject?.id ?? cfg?.subject?.actor?.id ?? cfg?.actorId ?? null;
 const applyVisibilityToConfig = (config, skillId, vis) => {
@@ -172,6 +228,7 @@ Hooks.on("preCreateChatMessage", (msg, data, options, userId) => {
             return;
         const recipients = buildMessageRecipients(vis.mode, authorId);
         msg.updateSource({ blind: recipients.blind, whisper: recipients.whisper });
+        msg.updateSource({ [`flags.${MOD}.rollKind`]: "skill" });
         if (recipients.bsrBlind) {
             msg.updateSource({ [`flags.${MOD}.bsrBlind`]: true });
         }

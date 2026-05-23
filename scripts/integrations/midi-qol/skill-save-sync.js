@@ -1,31 +1,39 @@
 import { MOD } from "../../core/constants.js";
-import { dbgInfo, dbgWarn } from "../../debug/logger.js";
+import { dbgDebug, dbgInfo, dbgWarn } from "../../debug/logger.js";
 const MIDI_ID = "midi-qol";
 const SKILL_LIST = ["acr", "ani", "arc", "ath", "dec", "his", "ins", "inv", "itm", "med", "nat", "per", "prc", "prf", "rel", "slt", "ste", "sur"];
-const SAVE_LIST = ["str", "dex", "con", "int", "wis", "cha"];
+const ABILITY_LIST = ["str", "dex", "con", "int", "wis", "cha"];
+const SAVE_LIST = ABILITY_LIST;
 const SYNC_DEBOUNCE_MS = 800;
+const LEGACY_SHOW_SYNC_MESSAGES_KEY = `${MOD}.showSyncMessages`;
 let _isSyncing = false;
 let _lastSyncDirection = null;
 let _syncTimeout = null;
+let _checkSyncTimeout = null;
 let _saveSyncTimeout = null;
 function isMidiActive() {
     if (typeof game === "undefined" || !game.modules)
         return false;
     return game.modules.get(MIDI_ID)?.active === true;
 }
-function shouldShowMessages() {
-    if (!game.user?.isGM)
-        return false;
-    try {
-        return game.settings.get(MOD, "showSyncMessages");
-    }
-    catch {
-        return true;
-    }
-}
 function showNotification(message) {
-    if (shouldShowMessages() && game.user?.isGM)
+    if (game.user?.isGM)
         ui.notifications.info(message);
+}
+async function deleteLegacyShowSyncMessagesSetting() {
+    try {
+        if (!game.user?.isGM)
+            return;
+        const worldSettings = game.settings.storage?.get?.("world");
+        const legacy = worldSettings?.getSetting?.(LEGACY_SHOW_SYNC_MESSAGES_KEY, null);
+        if (!legacy)
+            return;
+        await legacy.delete();
+        dbgDebug("midi-sync | removed legacy BSR showSyncMessages setting");
+    }
+    catch (e) {
+        dbgWarn("midi-sync | legacy showSyncMessages cleanup failed", e);
+    }
 }
 async function updateMidiConfig(cfgSettings) {
     if (!isMidiActive())
@@ -52,6 +60,25 @@ function buildBlindSkillList() {
         try {
             if (game.settings.get(MOD, sk))
                 list.push(sk);
+        }
+        catch { /* ignore */ }
+    }
+    return list;
+}
+function buildBlindCheckList() {
+    const areChecksEnabled = (() => { try {
+        return !!game.settings.get(MOD, "abilityChecksEnabled");
+    }
+    catch {
+        return false;
+    } })();
+    if (!areChecksEnabled)
+        return [];
+    const list = [];
+    for (const ab of ABILITY_LIST) {
+        try {
+            if (game.settings.get(MOD, "ability_" + ab))
+                list.push(ab);
         }
         catch { /* ignore */ }
     }
@@ -93,11 +120,13 @@ async function performInitialSync() {
             return;
         }
         const blindSkills = buildBlindSkillList();
+        const blindChecks = buildBlindCheckList();
         const blindSaves = buildBlindSaveList();
         cfgSettings.rollSkillsBlind = blindSkills.length === SKILL_LIST.length ? ["all"] : blindSkills;
+        cfgSettings.rollChecksBlind = blindChecks.length === ABILITY_LIST.length ? ["all"] : blindChecks;
         cfgSettings.rollSavesBlind = blindSaves.length === SAVE_LIST.length ? ["all"] : blindSaves;
         await updateMidiConfig(cfgSettings);
-        dbgInfo(`midi-sync | Initial sync complete: ${blindSkills.length} blind skills, ${blindSaves.length} blind saves → midi-qol`);
+        dbgInfo(`midi-sync | Initial sync complete: ${blindSkills.length} blind skills, ${blindChecks.length} blind ability checks, ${blindSaves.length} blind saves -> midi-qol`);
         showNotification(game.i18n.localize("BSR.MidiSync.Notification.InitSync"));
     }
     catch (e) {
@@ -127,12 +156,14 @@ async function syncBSRToMidi() {
             return;
         }
         const blindSkills = buildBlindSkillList();
+        const blindChecks = buildBlindCheckList();
         const blindSaves = buildBlindSaveList();
         cfgSettings.rollSkillsBlind = blindSkills.length === SKILL_LIST.length ? ["all"] : blindSkills;
+        cfgSettings.rollChecksBlind = blindChecks.length === ABILITY_LIST.length ? ["all"] : blindChecks;
         cfgSettings.rollSavesBlind = blindSaves.length === SAVE_LIST.length ? ["all"] : blindSaves;
         await updateMidiConfig(cfgSettings);
-        dbgInfo(`midi-sync | Synced ${blindSkills.length} blind skills, ${blindSaves.length} blind saves to midi-qol`);
-        showNotification(game.i18n.format("BSR.MidiSync.Notification.SyncedTo", { count: blindSkills.length }));
+        dbgInfo(`midi-sync | Synced ${blindSkills.length} blind skills, ${blindChecks.length} blind ability checks, ${blindSaves.length} blind saves to midi-qol`);
+        showNotification(game.i18n.format("BSR.MidiSync.Notification.SyncedTo", { count: blindSkills.length + blindChecks.length + blindSaves.length }));
     }
     catch (e) {
         dbgWarn("midi-sync | sync error (BSR → midi):", e);
@@ -191,6 +222,38 @@ Hooks.on("updateSetting", async (document) => {
                 }
             }
             catch { /* ignore */ }
+            let midiChecks = cfgSettings.rollChecksBlind || [];
+            if (midiChecks.includes("all"))
+                midiChecks = [...ABILITY_LIST];
+            let checkChanges = 0;
+            for (const ab of ABILITY_LIST) {
+                const want = midiChecks.includes(ab);
+                try {
+                    const current = game.settings.get(MOD, "ability_" + ab);
+                    if (current !== want && game.user.isGM) {
+                        await game.settings.set(MOD, "ability_" + ab, want);
+                        checkChanges++;
+                        if (want) {
+                            try {
+                                if (game.settings.get(MOD, "ability_" + ab + "_private")) {
+                                    await game.settings.set(MOD, "ability_" + ab + "_private", false);
+                                    checkChanges++;
+                                }
+                            }
+                            catch { /* ignore */ }
+                        }
+                    }
+                }
+                catch { /* ignore */ }
+            }
+            const wantChecksEnabled = midiChecks.length > 0;
+            try {
+                if (!!game.settings.get(MOD, "abilityChecksEnabled") !== wantChecksEnabled && game.user.isGM) {
+                    await game.settings.set(MOD, "abilityChecksEnabled", wantChecksEnabled);
+                    checkChanges++;
+                }
+            }
+            catch { /* ignore */ }
             let midiSaves = cfgSettings.rollSavesBlind || [];
             if (midiSaves.includes("all"))
                 midiSaves = [...SAVE_LIST];
@@ -223,9 +286,9 @@ Hooks.on("updateSetting", async (document) => {
                 }
             }
             catch { /* ignore */ }
-            if (skillChanges > 0 || saveChanges > 0) {
-                dbgInfo(`midi-sync | Synced ${midiSkills.length} blind skills, ${midiSaves.length} blind saves from midi-qol (${skillChanges + saveChanges} changed)`);
-                showNotification(game.i18n.format("BSR.MidiSync.Notification.SyncedFrom", { count: midiSkills.length }));
+            if (skillChanges > 0 || checkChanges > 0 || saveChanges > 0) {
+                dbgInfo(`midi-sync | Synced ${midiSkills.length} blind skills, ${midiChecks.length} blind ability checks, ${midiSaves.length} blind saves from midi-qol (${skillChanges + checkChanges + saveChanges} changed)`);
+                showNotification(game.i18n.format("BSR.MidiSync.Notification.SyncedFrom", { count: midiSkills.length + midiChecks.length + midiSaves.length }));
             }
         }
         catch (e) {
@@ -257,6 +320,24 @@ Hooks.on("updateSetting", async (document) => {
             }
             return;
         }
+        if (settingName.startsWith("ability_")) {
+            const abilityKey = settingName.replace("ability_", "").replace("_private", "");
+            if (ABILITY_LIST.includes(abilityKey) && !settingName.endsWith("_private")) {
+                if (!isMidiActive())
+                    return;
+                if (_checkSyncTimeout)
+                    clearTimeout(_checkSyncTimeout);
+                _checkSyncTimeout = setTimeout(async () => { _checkSyncTimeout = null; await syncBSRToMidi(); }, SYNC_DEBOUNCE_MS);
+            }
+            return;
+        }
+        if (settingName === "abilityChecksEnabled") {
+            if (!isMidiActive())
+                return;
+            if (_checkSyncTimeout)
+                clearTimeout(_checkSyncTimeout);
+            _checkSyncTimeout = setTimeout(async () => { _checkSyncTimeout = null; await syncBSRToMidi(); }, SYNC_DEBOUNCE_MS);
+        }
         if (settingName === "savesEnabled") {
             if (!isMidiActive())
                 return;
@@ -274,5 +355,6 @@ Hooks.on("updateSetting", async (document) => {
     }
 });
 Hooks.once("ready", async () => {
+    await deleteLegacyShowSyncMessagesSetting();
     setTimeout(async () => { await performInitialSync(); }, 500);
 });

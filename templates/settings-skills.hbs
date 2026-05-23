@@ -46,6 +46,48 @@
 
   <div class="bsr-card">
     <div class="bsr-card__header">
+      <span class="bsr-card__title"><i class="fa-solid fa-dice"></i> {{labels.abilityChecks}}</span>
+      <div class="bsr-card__actions">
+        <button type="button" class="bsr-btn bsr-btn-sm" data-action="allAbilities">{{labels.allAbilities}}</button>
+        <button type="button" class="bsr-btn bsr-btn-sm" data-action="noneAbilities">{{labels.noneAbilities}}</button>
+      </div>
+    </div>
+    <div class="bsr-card__body">
+      <label class="bsr-form-check">
+        <input type="checkbox" name="abilityChecksEnabled" {{#if abilityChecksEnabled}}checked{{/if}}>
+        <span>{{labels.abilityChecksEnabledName}}</span>
+      </label>
+      <label class="bsr-form-check">
+        <input type="checkbox" name="blindRollersAbilityChat" {{#if blindRollersAbilityChat}}checked{{/if}}>
+        <span>{{labels.blindRollersAbilityChatName}}</span>
+      </label>
+      <div class="bsr-skill-grid">
+        <strong></strong>
+        <strong class="bsr-skill-grid__colhdr">{{labels.blind}}</strong>
+        <strong class="bsr-skill-grid__colhdr">{{labels.private}}</strong>
+        <span class="bsr-skill-grid__sep"></span>
+        <strong></strong>
+        <strong class="bsr-skill-grid__colhdr">{{labels.blind}}</strong>
+        <strong class="bsr-skill-grid__colhdr">{{labels.private}}</strong>
+        {{#each abilityGridRows}}
+          <span class="bsr-skill-grid__name">{{left.label}}</span>
+          <label class="bsr-skill-grid__cb"><input type="checkbox" data-ability="{{left.key}}" data-mode="blind" {{#if left.blind}}checked{{/if}} {{#if left.private}}disabled{{/if}}></label>
+          <label class="bsr-skill-grid__cb"><input type="checkbox" data-ability="{{left.key}}" data-mode="private" {{#if left.private}}checked{{/if}} {{#if left.blind}}disabled{{/if}}></label>
+          <span class="bsr-skill-grid__sep"></span>
+          {{#if right}}
+            <span class="bsr-skill-grid__name">{{right.label}}</span>
+            <label class="bsr-skill-grid__cb"><input type="checkbox" data-ability="{{right.key}}" data-mode="blind" {{#if right.blind}}checked{{/if}} {{#if right.private}}disabled{{/if}}></label>
+            <label class="bsr-skill-grid__cb"><input type="checkbox" data-ability="{{right.key}}" data-mode="private" {{#if right.private}}checked{{/if}} {{#if right.blind}}disabled{{/if}}></label>
+          {{else}}
+            <span></span><span></span><span></span>
+          {{/if}}
+        {{/each}}
+      </div>
+    </div>
+  </div>
+
+  <div class="bsr-card">
+    <div class="bsr-card__header">
       <span class="bsr-card__title"><i class="fa-solid fa-shield-halved"></i> {{labels.saves}}</span>
       <div class="bsr-card__actions">
         <button type="button" class="bsr-btn bsr-btn-sm" data-action="allSaves">{{labels.allSaves}}</button>

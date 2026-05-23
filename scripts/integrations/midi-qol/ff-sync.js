@@ -9,18 +9,8 @@ let _ffSyncing = false;
 let _ffSyncDirection = null;
 let _ffSyncTimeout = null;
 let _ffInitDone = false;
-function shouldShowMessages() {
-    if (!game.user?.isGM)
-        return false;
-    try {
-        return game.settings.get(MOD, "showSyncMessages");
-    }
-    catch {
-        return true;
-    }
-}
 function showNotification(message) {
-    if (shouldShowMessages() && game.user?.isGM)
+    if (game.user?.isGM)
         ui.notifications.info(message);
 }
 function isMidiActive() {

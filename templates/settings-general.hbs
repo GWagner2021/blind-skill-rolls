@@ -17,30 +17,6 @@
 
   <div class="bsr-card">
     <div class="bsr-card__header">
-      <span class="bsr-card__title"><i class="fa-solid fa-gear"></i> {{labels.integration}}</span>
-    </div>
-    <div class="bsr-card__body">
-      <label class="bsr-form-check">
-        <input type="checkbox" name="showSyncMessages" {{#if showSyncMessages}}checked{{/if}}>
-        <span>{{labels.syncName}}</span>
-      </label>
-      <p class="bsr-hint">{{labels.syncHint}}</p>
-
-      <div class="bsr-section-label"><i class="fa-solid fa-dice-d20"></i> {{labels.dsnSection}}</div>
-      <div class="bsr-form-group">
-        <label class="bsr-form-group__label">{{labels.dsnName}}</label>
-        <select name="dsnGhostDiceMode" class="bsr-form-group__control">
-          <option value="0" {{#if dsnOff}}selected{{/if}}>{{labels.dsnOff}}</option>
-          <option value="2" {{#if dsnAuthor}}selected{{/if}}>{{labels.dsnAuthor}}</option>
-          <option value="1" {{#if dsnOn}}selected{{/if}}>{{labels.dsnOn}}</option>
-        </select>
-      </div>
-      <p class="bsr-hint">{{labels.dsnHint}}</p>
-    </div>
-  </div>
-
-  <div class="bsr-card">
-    <div class="bsr-card__header">
       <span class="bsr-card__title"><i class="fa-solid fa-palette"></i> {{labels.cardColors}}</span>
     </div>
     <div class="bsr-card__body">

@@ -23,15 +23,10 @@ class BSRMenuGeneral extends HandlebarsApplicationMixin(ApplicationV2) {
     async _prepareContext(options) {
         const context = await super._prepareContext(options);
         const theme = getSetting("bsrTheme", "light");
-        const dsn = String(getSetting("dsnGhostDiceMode", "2"));
         return {
             ...context,
             themeLight: theme === "light",
             themeDark: theme === "dark",
-            showSyncMessages: !!getSetting("showSyncMessages", true),
-            dsnOff: dsn === "0",
-            dsnOn: dsn === "1",
-            dsnAuthor: dsn === "2",
             customColors: !!getSetting("bsrCustomCardColorsEnabled", false),
             blindCardColorRgb: parseHexAlpha(getSetting("bsrBlindCardColor", DEFAULT_BLIND_CARD_COLOR)).rgb,
             blindCardColorAlpha: parseHexAlpha(getSetting("bsrBlindCardColor", DEFAULT_BLIND_CARD_COLOR)).alpha,
@@ -45,15 +40,6 @@ class BSRMenuGeneral extends HandlebarsApplicationMixin(ApplicationV2) {
                 themeHint: L("BSR.General.Settings.Theme.Hint", "Choose between a light or dark theme for module dialogs."),
                 themeLight: L("BSR.General.Option.ThemeLight", "Light"),
                 themeDark: L("BSR.General.Option.ThemeDark", "Dark"),
-                integration: L("BSR.General.Section.Integration", "Integration"),
-                syncName: L("BSR.MidiSync.Settings.ShowNotifications.Name", "Show sync notifications"),
-                syncHint: L("BSR.MidiSync.Settings.ShowNotifications.Hint", "Display notifications when blind skill settings are synced with midi-qol. (GM only)"),
-                dsnSection: L("BSR.General.Section.DSN", "Dice So Nice"),
-                dsnName: L("BSR.DSN.Settings.GhostDice.Name", "Dice So Nice: Ghost dice"),
-                dsnHint: L("BSR.DSN.Settings.GhostDice.Hint", "Show ghost dice for all players, or disable ghost dice entirely."),
-                dsnOff: L("DICESONICE.ghostDiceDisabled", "Disabled"),
-                dsnOn: L("DICESONICE.ghostDiceForAll", "Show for all players"),
-                dsnAuthor: L("DICESONICE.ghostDiceForRollAuthor", "To the roll author only"),
                 cardColors: L("BSR.Chat.Section.CardColors", "Chat Card Colors"),
                 customColorsName: L("BSR.Chat.Settings.CustomCardColors.Name", "Enable custom chat card colors"),
                 customColorsHint: L("BSR.Chat.Settings.CustomCardColors.Hint", "When enabled, applies your chosen background colors to Blind GM Roll and Private GM Roll chat cards. When disabled, the default FoundryVTT styling is used."),
@@ -91,8 +77,6 @@ class BSRMenuGeneral extends HandlebarsApplicationMixin(ApplicationV2) {
             return;
         const fd = new foundry.applications.ux.FormDataExtended(form).object;
         await game.settings.set(MOD, "bsrTheme", String(fd.bsrTheme ?? "light"));
-        await game.settings.set(MOD, "showSyncMessages", !!fd.showSyncMessages);
-        await game.settings.set(MOD, "dsnGhostDiceMode", String(fd.dsnGhostDiceMode ?? "2"));
         await game.settings.set(MOD, "bsrCustomCardColorsEnabled", !!fd.customColors);
         await game.settings.set(MOD, "bsrBlindCardColor", toHexAlpha(fd.blindCardColorRgb || parseHexAlpha(DEFAULT_BLIND_CARD_COLOR).rgb, fd.blindCardColorAlpha ?? parseHexAlpha(DEFAULT_BLIND_CARD_COLOR).alpha));
         await game.settings.set(MOD, "bsrPrivateCardColor", toHexAlpha(fd.privateCardColorRgb || parseHexAlpha(DEFAULT_PRIVATE_CARD_COLOR).rgb, fd.privateCardColorAlpha ?? parseHexAlpha(DEFAULT_PRIVATE_CARD_COLOR).alpha));

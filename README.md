@@ -50,8 +50,8 @@ Included languages are English, German, French, Spanish, Italian, Polish, and Ru
 
 ## 📋 Requirements
 
-- Foundry VTT **v14.360**
-- **dnd5e 5.3.1**
+- Foundry VTT **v14.363**
+- **dnd5e 5.3.3**
 
 ## 🧩 Compatible modules
 

@@ -1,15 +1,12 @@
 
 import { MOD } from "../../core/constants.js";
+import { shouldHideForeignSecrets } from "../../core/policy/chat-privacy.js";
 import { dbgDebug, dbgWarn } from "../../debug/logger.js";
 
 const MIDI_ID = "midi-qol";
 function isMidiActive(): boolean {
   try { return game.modules?.get(MIDI_ID)?.active === true; } catch { return false; }
 }
-
-const OPT_HIDE = (): boolean => {
-  try { return game.settings.get(MOD, "hideForeignSecrets") as boolean; } catch { return true; }
-};
 
 Hooks.once("ready", () => {
   if (!isMidiActive()) return;
@@ -20,7 +17,7 @@ Hooks.once("ready", () => {
       if (!flags) return;
 
       if (!flags.bsrPrivate) return;
-      if (OPT_HIDE()) return;
+      if (shouldHideForeignSecrets()) return;
 
       const whisper = msg.whisper;
       if (!Array.isArray(whisper) || whisper.length === 0) return;

@@ -1,7 +1,5 @@
-import { MOD } from "../core/constants.js";
+import { shouldMuteForeignSecretSounds } from "../core/policy/chat-privacy.js";
 import { dbgWarn } from "../debug/logger.js";
-
-const OPT_MUTE = (): boolean => { try { return game.settings.get(MOD, "muteForeignSecretSounds") as boolean; } catch { return true; } };
 
 const meId = (): string | null => game.user?.id ?? null;
 
@@ -52,7 +50,7 @@ const RX_DICE_GENERIC = /(\/|^)sounds\/.*dice|(^|\/)dice\.(wav|mp3|ogg)|\bd(20|1
 
 function shouldBlockSrc(src: string): boolean {
   if (game.user?.isGM) return false;
-  if (!OPT_MUTE() && !muteGate.force) return false;
+  if (!shouldMuteForeignSecretSounds() && !muteGate.force) return false;
   if (!muteGate.active) return false;
   const s = String(src || "");
   return RX_DICE_CORE.test(s) || RX_DICE_GENERIC.test(s);
@@ -73,7 +71,7 @@ const muteGate: MuteGateState = { active: false, until: 0, prevMuted: null, time
 
 export function openMute(ms = 4000, force = false): void {
   if (game.user!.isGM) return;
-  if (!force && !OPT_MUTE()) return;
+  if (!force && !shouldMuteForeignSecretSounds()) return;
   const t = now() + ms; muteGate.until = Math.max(muteGate.until, t);
   if (force) muteGate.force = true;
   if (!muteGate.active) {
@@ -105,7 +103,7 @@ function patchAudioHelperPlay(): void {
     AH.play = async function (this: any, arg0: unknown, ...args: unknown[]) {
       const src = resolveSrc(arg0, args);
       if (shouldBlockSrc(src)) return null;
-      if (!game.user!.isGM && (OPT_MUTE() || muteGate.force) && muteGate.active) { extendMute(200); return null; }
+      if (!game.user!.isGM && (shouldMuteForeignSecretSounds() || muteGate.force) && muteGate.active) { extendMute(200); return null; }
       return (_play as any).call(this, arg0, ...args);
     } as any;
     (AH.play as any)._bsrPatched = true;
@@ -123,7 +121,7 @@ function patchFoundrySoundClass(): void {
       try {
         const src: string = this?.src ?? this?.path ?? this?.url ?? this?.howl?._src ?? "";
         if (shouldBlockSrc(src)) return null;
-        if (!game.user!.isGM && (OPT_MUTE() || muteGate.force) && muteGate.active) { extendMute(200); return null; }
+        if (!game.user!.isGM && (shouldMuteForeignSecretSounds() || muteGate.force) && muteGate.active) { extendMute(200); return null; }
       } catch { /* ignore */ }
       return _play.apply(this, args as any);
     } as any;
@@ -142,7 +140,7 @@ function patchHowlerPlay(): void {
       try {
         const src: string = Array.isArray(this._src) ? this._src[0] : this._src;
         if (shouldBlockSrc(src)) return this;
-        if (!game.user!.isGM && (OPT_MUTE() || muteGate.force) && muteGate.active) { extendMute(200); return this; }
+        if (!game.user!.isGM && (shouldMuteForeignSecretSounds() || muteGate.force) && muteGate.active) { extendMute(200); return this; }
       } catch { /* ignore */ }
       return _hplay.apply(this, args as any);
     } as any;
@@ -161,7 +159,7 @@ function patchHTMLAudioPlay(): void {
       try {
         const src = this?.currentSrc || this?.src || "";
         if (shouldBlockSrc(src)) return Promise.resolve();
-        if (!game.user!.isGM && (OPT_MUTE() || muteGate.force) && muteGate.active) { extendMute(200); return Promise.resolve(); }
+        if (!game.user!.isGM && (shouldMuteForeignSecretSounds() || muteGate.force) && muteGate.active) { extendMute(200); return Promise.resolve(); }
       } catch { /* ignore */ }
       return _play.apply(this, args as []);
     } as any;
@@ -199,7 +197,7 @@ export function registerAudioHooks(): void {
       const authorUser = game.users?.get(String(authorId));
       const isGmAuthored = !!authorUser && isGMUser(authorUser);
       const forceMute = isBlind || isGmAuthored;
-      if (!forceMute && !OPT_MUTE()) return;
+      if (!forceMute && !shouldMuteForeignSecretSounds()) return;
       const me = meId();
       const author = String(_doc?.author?.id ?? data?.author?.id ?? data?.author ?? "");
       const wh: string[] = Array.isArray(whisper) ? whisper.map(String) : [];
@@ -217,7 +215,7 @@ export function registerAudioHooks(): void {
       const authorUser = doc?.author;
       const isGmAuthored = !!authorUser && isGMUser(authorUser);
       const forceMute = isBlind || isGmAuthored;
-      if (!forceMute && !OPT_MUTE()) return;
+      if (!forceMute && !shouldMuteForeignSecretSounds()) return;
       if (!isAddressedToMe(doc)) openMute(1800, forceMute);
     } catch { /* ignore */ }
   });

@@ -1,11 +1,10 @@
 import { MOD } from "../core/constants.js";
+import { shouldHideForeignSecrets } from "../core/policy/chat-privacy.js";
 import { isDeathSaveMessage } from "../core/policy/roll-classification.js";
 import { dbgWarn, dbgDebug } from "../debug/logger.js";
 import { installAudioPatches, registerAudioHooks } from "./audio-suppression.js";
 
 const L = (k: string, fb?: string): string => { try { const t = game?.i18n?.localize?.(k); return (t && t !== k) ? t : (fb ?? k); } catch { return fb ?? k; } };
-
-const OPT_HIDE = (): boolean => { try { return game.settings.get(MOD, "hideForeignSecrets") as boolean; } catch { return true; } };
 
 const VISIBILITY_RECHECK_DELAY_MS = 200;
 
@@ -39,9 +38,36 @@ const isRevealedToCurrentUser = (m: any): boolean => {
   try { return !!m?.getFlag?.(MOD, "revealedToRoller"); } catch { return false; }
 };
 
+function readChangedValue(changed: any, path: string): unknown {
+  if (changed && typeof changed === "object" && path in changed) return changed[path];
+  let cursor = changed;
+  for (const part of path.split(".")) {
+    if (!cursor || typeof cursor !== "object" || !(part in cursor)) return undefined;
+    cursor = cursor[part];
+  }
+  return cursor;
+}
+
+function isPublicRevealUpdate(message: any, changed: any): boolean {
+  if (!isBsrSecret(message)) return false;
+
+  const nextBlind = readChangedValue(changed, "blind");
+  const nextWhisper = readChangedValue(changed, "whisper");
+  const effectiveBlind = nextBlind === undefined ? !!message?.blind : nextBlind === true;
+  const effectiveWhisper = Array.isArray(nextWhisper) ? nextWhisper : whisperIds(message);
+
+  return effectiveBlind === false && Array.isArray(effectiveWhisper) && effectiveWhisper.length === 0;
+}
+
+function clearBsrSecretFlags(changed: any): void {
+  changed.flags ??= {};
+  changed.flags[MOD] = { ...(changed.flags[MOD] ?? {}), bsrBlind: false, bsrPrivate: false, revealedToRoller: false };
+}
+
 function applyClientSecretClasses(el: HTMLElement, message: any): void {
   const revealedToMe = isBsrBlind(message) && isRevealedToCurrentUser(message);
   if (revealedToMe) {
+    el.classList.remove("hidden_msg");
     el.classList.remove("blind");
     el.classList.add("whisper");
     return;
@@ -80,7 +106,7 @@ function shouldHideForMe(m: any): boolean {
   }
   if (isBsrBlind(m) && !isAddressedToMe(m)) return true;
   if (isAddressedToMe(m)) return false;         
-  return OPT_HIDE();                             
+  return shouldHideForeignSecrets();                             
 }
 
 // ---- ChatMessage.visible override ----
@@ -117,7 +143,7 @@ function patchMessageVisibility(): void {
             return isAuthor;
           }
 
-          if (!OPT_HIDE() && Array.isArray(this.whisper) && this.whisper.length > 0) {
+          if (!shouldHideForeignSecrets() && Array.isArray(this.whisper) && this.whisper.length > 0) {
             if (isGmAuthor(this)) return false;
             return true;
           }
@@ -188,7 +214,7 @@ function ensureInstanceVisible(doc: any): void {
         if (this.blind) return false;
         if (whisperIds(this).map(String).includes(meStr)) return true;
         if (isGmAuthor(this)) return false;
-        return !OPT_HIDE();
+        return !shouldHideForeignSecrets();
       },
       configurable: true,
       enumerable: true
@@ -382,13 +408,31 @@ function redactBlindResults(html: HTMLElement): void {
 // ---- Blind-Roller-Chat-Masking classification ----
 function isSavingThrowMessage(message: any): boolean {
   try {
+    const bsrKind = message?.flags?.[MOD]?.rollKind ?? message?.getFlag?.(MOD, "rollKind");
+    if (bsrKind === "save") return true;
+    if (bsrKind === "abilityCheck" || bsrKind === "skill") return false;
     const d5 = message?.flags?.dnd5e ?? {};
     const rollType = d5?.roll?.type ?? d5?.type ?? d5?.rollType ?? null;
     const hasAbility = !!(d5?.roll?.abilityId || d5?.abilityId);
     const hasSkill = !!(d5?.roll?.skillId || d5?.skillId || d5?.roll?.skill || d5?.skill);
     const isDeath = isDeathSaveMessage(message);
     if (isDeath || hasSkill) return false;
-    return rollType === "save" || rollType === "ability" || hasAbility;
+    return rollType === "save" || (hasAbility && rollType !== "ability" && rollType !== "check");
+  } catch { return false; }
+}
+
+function isAbilityCheckMessage(message: any): boolean {
+  try {
+    const bsrKind = message?.flags?.[MOD]?.rollKind ?? message?.getFlag?.(MOD, "rollKind");
+    if (bsrKind === "abilityCheck") return true;
+    if (bsrKind === "save" || bsrKind === "skill") return false;
+    const d5 = message?.flags?.dnd5e ?? {};
+    const rollType = d5?.roll?.type ?? d5?.type ?? d5?.rollType ?? null;
+    const hasAbility = !!(d5?.roll?.abilityId || d5?.roll?.ability || d5?.abilityId || d5?.ability);
+    const hasSkill = !!(d5?.roll?.skillId || d5?.skillId || d5?.roll?.skill || d5?.skill);
+    const isDeath = isDeathSaveMessage(message);
+    if (isDeath || hasSkill) return false;
+    return rollType === "ability" || rollType === "check" || (hasAbility && rollType !== "save");
   } catch { return false; }
 }
 
@@ -429,13 +473,16 @@ Hooks.on("renderChatMessageHTML", (message: any, html: HTMLElement) => {
         if (isRoller) {
           const revealedToRoller = revealedToMe;
           const isSave = isSavingThrowMessage(message);
+          const isAbilityCheck = isAbilityCheckMessage(message);
           const isDeath = isDeathSaveMessage(message);
 
           if (isSave && game.settings.get(MOD, "blindRollersSaveChat") && !revealedToRoller)
             html.classList.add("hidden_msg");
-          else if (!isSave && !isDeath && game.settings.get(MOD, "blindRollersChat") && !revealedToRoller)
+          else if (isAbilityCheck && game.settings.get(MOD, "blindRollersAbilityChat") && !revealedToRoller)
             html.classList.add("hidden_msg");
-          else if (isDeath && game.settings.get(MOD, "blindRollersDeathSaveChat"))
+          else if (!isSave && !isAbilityCheck && !isDeath && game.settings.get(MOD, "blindRollersChat") && !revealedToRoller)
+            html.classList.add("hidden_msg");
+          else if (isDeath && game.settings.get(MOD, "blindRollersDeathSaveChat") && !revealedToRoller)
             html.classList.add("hidden_msg");
         }
       }
@@ -550,6 +597,23 @@ Hooks.on("createChatMessage", (doc: any) => {
   } catch { /* ignore */ }
 });
 
+Hooks.on("preUpdateChatMessage", (message: any, changed: any) => {
+  try {
+    if (!game.user?.isGM) return;
+    if (!isPublicRevealUpdate(message, changed)) return;
+    clearBsrSecretFlags(changed);
+  } catch (e) {
+    dbgWarn("chat-visibility | preUpdateChatMessage public reveal", e);
+  }
+});
+
+Hooks.on("updateChatMessage", (message: any) => {
+  try {
+    if (isBsrSecret(message) && !isRevealedToCurrentUser(message)) return;
+    deferredSweep();
+  } catch { /* ignore */ }
+});
+
 // ---- Settings change: hideForeignSecrets ----
 Hooks.on("updateSetting", (setting: any) => {
   try {
@@ -601,7 +665,7 @@ Hooks.once("ready", () => {
 
   deferredSweep();
 
-  dbgDebug(`chat-visibility | ready | gm=${isGM} | hide=${OPT_HIDE()}`);
+  dbgDebug(`chat-visibility | ready | gm=${isGM} | hide=${shouldHideForeignSecrets()}`);
 });
 
 Hooks.on("renderChatLog", () => { applyCssGuard(); observeSidebar(); deferredSweep(); });

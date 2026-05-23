@@ -1,18 +1,24 @@
 import { MOD, BLIND, GMROLL } from "../constants.js";
+import { shouldHideForeignSecrets } from "./chat-privacy.js";
+import { isAbilityCheckBlind, isAbilityCheckPrivate, normalizeAbilityId } from "./ability-check-policy.js";
 import { isSkillBlind, isSkillPrivate } from "./skill-policy.js";
 import { isSaveBlind, isSavePrivate } from "./save-policy.js";
-const OPT_HIDE = () => { try {
-    return game.settings.get(MOD, "hideForeignSecrets");
-}
-catch {
-    return true;
-} };
 export function resolveSkillVisibility(skillId) {
     if (!skillId || typeof skillId !== "string")
         return { mode: null, force: false };
     if (isSkillBlind(skillId))
         return { mode: BLIND, force: true };
     if (isSkillPrivate(skillId))
+        return { mode: GMROLL, force: true };
+    return { mode: null, force: false };
+}
+export function resolveAbilityCheckVisibility(abilityId) {
+    const normalized = normalizeAbilityId(abilityId);
+    if (!normalized)
+        return { mode: null, force: false };
+    if (isAbilityCheckBlind(normalized))
+        return { mode: BLIND, force: true };
+    if (isAbilityCheckPrivate(normalized))
         return { mode: GMROLL, force: true };
     return { mode: null, force: false };
 }
@@ -59,7 +65,7 @@ export function buildMessageRecipients(mode, authorId) {
                 whisperSet.add(authorId);
             return { whisper: Array.from(whisperSet), blind: false, bsrBlind: false, bsrPrivate: false };
         }
-        if (!OPT_HIDE()) {
+        if (!shouldHideForeignSecrets()) {
             return { whisper: [], blind: false, bsrBlind: false, bsrPrivate: true };
         }
         const whisperSet = new Set(gmIds);

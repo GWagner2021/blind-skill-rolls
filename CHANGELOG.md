@@ -1,3 +1,25 @@
+## [1.4.1] - 2026-05-23
+
+This release expands Blind Skill Rolls with ability check support and improves chat privacy.
+
+### Added
+- Added **Ability Check** support for Blind GM Roll and Private GM Roll.
+
+### Changed
+- Expanded the **Skills & Saving Throws** settings menu to include **Ability Checks**.
+- Improved death save roll-mode enforcement before the roll dialog and during message creation.
+- Simplified chat privacy settings: hiding foreign secret messages now also mutes their dice sounds.
+- Simplified general settings by removing legacy integration controls from the BSR settings UI.
+
+### Fixed
+- Fixed death save visibility not always being applied early enough for the roll configuration dialog.
+- Fixed BSR private/blind roll flags not being cleared when a message is revealed publicly.
+- Fixed a GM chat context option to reveal BSR private roll messages to everyone.
+
+### Compatibility
+- Updated verified Foundry VTT compatibility to **14.363**.
+- Updated verified dnd5e compatibility to **5.3.3**.
+
 ## [1.4.0] - 2026-04-18
 
 This release improves MidiQOL and Dice So Nice compatibility, migrates the codebase to TypeScript, adds custom chat card colors, and fixes several dice visibility and timing issues.

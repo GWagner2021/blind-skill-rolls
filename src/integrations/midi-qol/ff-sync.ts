@@ -23,13 +23,8 @@ let _ffSyncDirection: SyncDirection = null;
 let _ffSyncTimeout: ReturnType<typeof setTimeout> | null = null;
 let _ffInitDone = false;
 
-function shouldShowMessages(): boolean {
-  if (!game.user?.isGM) return false;
-  try { return game.settings.get(MOD, "showSyncMessages") as boolean; } catch { return true; }
-}
-
 function showNotification(message: string): void {
-  if (shouldShowMessages() && game.user?.isGM) ui.notifications.info(message);
+  if (game.user?.isGM) ui.notifications.info(message);
 }
 
 function isMidiActive(): boolean {

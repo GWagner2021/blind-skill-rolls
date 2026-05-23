@@ -14,11 +14,15 @@ function applyModeSelect(
   if (!sel) return;
 
   if (sel.value !== mode) sel.value = mode;
-  sel.disabled = true;
+  sel.disabled = false;
+  sel.setAttribute("aria-disabled", "true");
+  sel.tabIndex = -1;
   sel.classList.add("bsr-rollmode--locked");
+  sel.onchange = () => { sel.value = mode; };
 
   const parent = sel.parentNode as HTMLElement | null;
   if (!parent) return;
+  sel.closest(".form-group")?.classList.add("bsr-rollmode-row--locked");
 
   const NOTE_TEXT: string = (game.i18n?.has?.(noteKey) ? game.i18n.localize(noteKey) : noteFallback);
 

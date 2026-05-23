@@ -365,13 +365,34 @@ html[data-bsr-gm="1"] .chat-message.hidden_msg::before {
    ========================= */
 
 .bsr-rollmode--locked {
-  opacity: 0.6;
   cursor: not-allowed;
 }
+select.bsr-rollmode--locked[aria-disabled="true"] {
+  display: none !important;
+}
+.bsr-rollmode-row--locked {
+  align-items: center;
+}
+.bsr-rollmode-row--locked > label {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 4.5rem !important;
+  margin-right: 0.5rem;
+}
+.bsr-rollmode-row--locked > .form-fields {
+  display: block !important;
+  width: 100%;
+  min-width: 0;
+}
 .bsr-rollmode-note {
-  font-size: 0.85em;
-  margin: 0.25rem 0 0 0;
+  font-size: 0.9em !important;
+  margin: 0 !important;
   font-style: italic;
+  width: 100%;
+}
+.dnd5e .bsr-rollmode-note,
+.dnd5e2 .bsr-rollmode-note {
+  font-size: 0.9em !important;
 }
 .bsr-rollmode-note--blind {
   color: #ff6b6b;

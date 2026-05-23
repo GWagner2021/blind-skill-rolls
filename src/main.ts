@@ -41,6 +41,7 @@ import "./ui/chat-card-colors.js";
 import "./feature/chat-visibility.js";
 import "./feature/npc-hidden-token-rolls.js";
 import "./feature/skills.js";
+import "./feature/ability-checks.js";
 import "./feature/saves.js";
 import "./feature/death-saves.js";
 import "./feature/fast-forward.js";

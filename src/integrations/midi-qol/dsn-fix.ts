@@ -1,26 +1,18 @@
 
-import { MOD } from "../../core/constants.js";
 import { peekDsnPendingMode, setDsnPendingMode } from "../../core/state/pending-dsn.js";
 import { peekPendingSkill } from "../../core/state/pending-skill.js";
 import { peekPendingSave } from "../../core/state/pending-save.js";
 import { isPendingHiddenNpc } from "../../core/state/pending-hidden-npc.js";
+import { shouldHideForeignSecrets, shouldMuteForeignSecretSounds } from "../../core/policy/chat-privacy.js";
 import { isSkillPrivate, isSkillBlind } from "../../core/policy/skill-policy.js";
 import { isSavePrivate, isSaveBlind } from "../../core/policy/save-policy.js";
 import { dbgDebug, dbgWarn } from "../../debug/logger.js";
 import { openMute } from "../../feature/audio-suppression.js";
 
-const OPT_MUTE = (): boolean => {
-  try { return game.settings.get(MOD, "muteForeignSecretSounds") as boolean; } catch { return true; }
-};
-
 const MIDI_ID = "midi-qol";
 function isMidiActive(): boolean {
   try { return game.modules?.get(MIDI_ID)?.active === true; } catch { return false; }
 }
-
-const OPT_HIDE = (): boolean => {
-  try { return game.settings.get(MOD, "hideForeignSecrets") as boolean; } catch { return true; }
-};
 
 // ─── Detect pending BSR mode ──────────────────────────────────────────────
 
@@ -250,12 +242,12 @@ Hooks.on("diceSoNiceReady", () => {
           } else if (pendingMode === 'hidden-npc') {
             markDiceBlind(data, rollerId);
             dbgDebug("midi-dsn-fix | pre-marked dice as blind (hidden-npc)");
-          } else if (pendingMode === 'private' && !OPT_HIDE()) {
+          } else if (pendingMode === 'private' && !shouldHideForeignSecrets()) {
             markDiceGhost(data, rollerId);
             dbgDebug("midi-dsn-fix | pre-marked dice as ghost (private, hideSecrets=OFF)");
             users = undefined;
             blind = false;
-          } else if (pendingMode === 'private' && OPT_HIDE()) {
+          } else if (pendingMode === 'private' && shouldHideForeignSecrets()) {
             users = undefined;
             blind = false;
           }
@@ -338,7 +330,7 @@ Hooks.on("diceSoNiceReady", () => {
           const rollerId = getRollerIdFromDice(notation);
           const isRoller = !!(rollerId && userId === rollerId);
 
-          if (!isGM && !isRoller && OPT_MUTE()) {
+          if (!isGM && !isRoller && shouldMuteForeignSecretSounds()) {
             try { openMute(2500, false); } catch { /* ignore */ }
           }
 

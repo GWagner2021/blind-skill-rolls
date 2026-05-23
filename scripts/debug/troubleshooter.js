@@ -388,6 +388,15 @@ catch {
 } };
 const displayNameForSetting = (key) => {
     const k = String(key ?? ""), lower = k.toLowerCase();
+    if (lower.startsWith("ability_")) {
+        const abilityKey = lower.replace(/^ability_/, "").replace(/_private$/, "");
+        try {
+            const entry = CONFIG?.DND5E?.abilities?.[abilityKey];
+            if (entry?.label)
+                return localizeMaybe(entry.label);
+        }
+        catch { /* ignore */ }
+    }
     if (lower.startsWith("save_")) {
         const abilityKey = lower.replace(/^save_/, "").replace(/_private$/, "");
         try {
@@ -421,6 +430,8 @@ const groupNameForSetting = (key) => {
     const base = k.replace(/_private$/, "");
     if (SKILL_KEYS.has(base) || k.startsWith("skill"))
         return k.endsWith("_private") ? "Skills Private" : "Skills Blind";
+    if (k.startsWith("ability_"))
+        return k.endsWith("_private") ? "Ability Checks Private" : "Ability Checks Blind";
     if (k.startsWith("save_"))
         return k.endsWith("_private") ? "Saving Throws Private" : "Saving Throws Blind";
     if (k.startsWith("ff"))
@@ -435,14 +446,15 @@ const groupNameForSetting = (key) => {
         return "Dice So Nice";
     return "Other";
 };
-const groupOrder = ["Skills Blind", "Skills Private", "Saving Throws Blind", "Saving Throws Private", "Death Saves", "Fast Forward GM", "Fast Forward Player", "Chat Display & Privacy", "Other BSR Settings", "Dice So Nice", "Other"];
+const groupOrder = ["Skills Blind", "Skills Private", "Ability Checks Blind", "Ability Checks Private", "Saving Throws Blind", "Saving Throws Private", "Death Saves", "Fast Forward GM", "Fast Forward Player", "Chat Display & Privacy", "Other BSR Settings", "Dice So Nice", "Other"];
 const GROUP_META = Object.freeze({
     "Skills Blind": { label: "Skills", tag: "Blind" }, "Skills Private": { label: "Skills", tag: "Private" },
+    "Ability Checks Blind": { label: "Ability Checks", tag: "Blind" }, "Ability Checks Private": { label: "Ability Checks", tag: "Private" },
     "Saving Throws Blind": { label: "Saving Throws", tag: "Blind" }, "Saving Throws Private": { label: "Saving Throws", tag: "Private" },
     "Fast Forward GM": { label: "Fast Forward", tag: "GM" }, "Fast Forward Player": { label: "Fast Forward", tag: "Player" }
 });
-const PAIRED_GROUPS = Object.freeze([["Skills Blind", "Skills Private"], ["Saving Throws Blind", "Saving Throws Private"], ["Fast Forward GM", "Fast Forward Player"]]);
-const PAIRED_HEADER_KEYS = Object.freeze({ "Skills Blind": { left: "enabled", right: "blindRollersChat" }, "Saving Throws Blind": { left: "savesEnabled", right: "blindRollersSaveChat" } });
+const PAIRED_GROUPS = Object.freeze([["Skills Blind", "Skills Private"], ["Ability Checks Blind", "Ability Checks Private"], ["Saving Throws Blind", "Saving Throws Private"], ["Fast Forward GM", "Fast Forward Player"]]);
+const PAIRED_HEADER_KEYS = Object.freeze({ "Skills Blind": { left: "enabled", right: "blindRollersChat" }, "Ability Checks Blind": { left: "abilityChecksEnabled", right: "blindRollersAbilityChat" }, "Saving Throws Blind": { left: "savesEnabled", right: "blindRollersSaveChat" } });
 const HEADER_KEY_SET = new Set(Object.values(PAIRED_HEADER_KEYS).flatMap(v => [v.left, v.right]).filter(Boolean));
 const getPath = (obj, path) => {
     if (!obj)
@@ -472,6 +484,8 @@ const buildMidiSummaryRows = () => {
     rows.push({ label: "GM: Auto fast forward rolls", value: stringifyVal(firstDefined(cfg, ["gmAutoFastForward", "gmAutoFastForwardRolls", "gmAutoFastForwardAbilityRolls", "gmAutoFastForwardAbility", "gm.autoFastForwardRolls", "gm.autoFastForwardAbilityRolls", "workflow.gm.autoFastForwardRolls", "workflow.gm.autoFastForwardAbilityRolls"]) ?? "unknown") });
     rows.push({ label: "Player: Auto fast forward rolls", value: stringifyVal(firstDefined(cfg, ["autoFastForward", "autoFastForwardRolls", "autoFastForwardAbilityRolls", "playerAutoFastForwardRolls", "playerAutoFastForwardAbilityRolls", "player.autoFastForwardRolls", "workflow.player.autoFastForwardRolls"]) ?? "unknown") });
     rows.push({ label: "Which skill checks are rolled blind", value: stringifyVal(firstDefined(cfg, ["rollSkillsBlind", "workflow.rollSkillsBlind", "blind.rollSkillsBlind"]) ?? "unknown") });
+    rows.push({ label: "Which ability checks are rolled blind", value: stringifyVal(firstDefined(cfg, ["rollChecksBlind", "workflow.rollChecksBlind", "blind.rollChecksBlind"]) ?? "unknown") });
+    rows.push({ label: "Which saving throws are rolled blind", value: stringifyVal(firstDefined(cfg, ["rollSavesBlind", "workflow.rollSavesBlind", "blind.rollSavesBlind"]) ?? "unknown") });
     return rows;
 };
 // =====================================================================
